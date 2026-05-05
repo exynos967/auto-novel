@@ -141,19 +141,15 @@ export const translateWeb = async (
       callback.log('重新翻译目录');
     }
 
-    if (coder.needUpload) {
-      if (translator.id === 'gpt') {
-        callback.log('目前LLM翻译目录超级不稳定，跳过');
-      } else {
-        callback.log('翻译元数据');
-        const textsDst = await translator.translate(coder.encoded, {
-          glossary: task.glossary,
-          signal,
-        });
+    if (coder.needUpload && translator.id !== 'gpt') {
+      callback.log('翻译元数据');
+      const textsDst = await translator.translate(coder.encoded, {
+        glossary: task.glossary,
+        signal,
+      });
 
-        callback.log(`上传元数据`);
-        await updateMetadataTranslation(coder.recover(textsDst));
-      }
+      callback.log(`上传元数据`);
+      await updateMetadataTranslation(coder.recover(textsDst));
     }
   } catch (e) {
     if (e === 'quit') {
