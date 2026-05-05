@@ -143,7 +143,7 @@ export const translateWeb = async (
 
     if (coder.needUpload) {
       if (translator.id === 'gpt') {
-        callback.log('目前GPT翻译目录超级不稳定，跳过');
+        callback.log('目前LLM翻译目录超级不稳定，跳过');
       } else {
         callback.log('翻译元数据');
         const textsDst = await translator.translate(coder.encoded, {

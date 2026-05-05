@@ -80,7 +80,7 @@ const clearCache = async () =>
 
 <template>
   <div class="layout-content">
-    <n-h1>GPT工作区</n-h1>
+    <n-h1>LLM工作区</n-h1>
 
     <bulletin>
       <n-flex>
@@ -94,7 +94,9 @@ const clearCache = async () =>
           DeepSeek API
         </n-a>
       </n-flex>
-      <n-p>不再支持GPT web，推荐使用deepseek API，价格很低。</n-p>
+      <n-p>
+        不再支持 LLM Web，推荐使用兼容 OpenAI 的 LLM API，例如 DeepSeek API。
+      </n-p>
       <n-p>本地小说支持韩语等其他语种，网络小说/文库小说暂时只允许日语。</n-p>
     </bulletin>
 

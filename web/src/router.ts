@@ -188,7 +188,7 @@ const router = createRouter({
           children: [
             {
               path: 'gpt',
-              meta: { title: 'GPT工作区' },
+              meta: { title: 'LLM工作区' },
               component: () => import('./pages/workspace/GptWorkspace.vue'),
             },
             {

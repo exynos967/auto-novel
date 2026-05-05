@@ -44,7 +44,7 @@ const startTranslateTask = (translatorId: 'baidu' | 'youdao') =>
     <n-text v-else>{{ volume.id }}</n-text>
 
     <n-text depth="3">
-      总计 {{ volume.toc.length }} / 百度 {{ baidu }} / 有道 {{ youdao }} / GPT
+      总计 {{ volume.toc.length }} / 百度 {{ baidu }} / 有道 {{ youdao }} / LLM
       {{ gpt }} / Sakura {{ sakura }}
     </n-text>
 

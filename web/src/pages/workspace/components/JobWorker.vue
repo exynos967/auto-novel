@@ -83,6 +83,7 @@ const running = computed(() => currentJob.value !== undefined);
 let abortHandler = () => {};
 
 const processTasks = async () => {
+  message.info('获取翻译任务');
   const controller = new AbortController();
   const { signal } = controller;
   abortHandler = () => controller.abort();

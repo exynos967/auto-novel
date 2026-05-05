@@ -258,7 +258,7 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
         <n-button-group size="small">
           <c-button
             v-if="setting.enabledTranslator.includes('gpt')"
-            label="排队GPT"
+            label="排队LLM"
             :round="false"
             @action="queueJobs('gpt')"
           />

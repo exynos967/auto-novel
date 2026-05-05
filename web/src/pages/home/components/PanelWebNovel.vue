@@ -24,7 +24,7 @@ defineProps<{
         <n-text depth="3">
           {{ item.type }} / 总计 {{ item.total }} / 百度 {{ item.baidu }}
           <br />
-          有道 {{ item.youdao }} / GPT {{ item.gpt }} / Sakura {{ item.sakura }}
+          有道 {{ item.youdao }} / LLM {{ item.gpt }} / Sakura {{ item.sakura }}
         </n-text>
       </n-grid-item>
     </n-grid>

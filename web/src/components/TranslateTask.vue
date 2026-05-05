@@ -55,7 +55,7 @@ const startTask = async (
     const idToLaber = {
       baidu: '百度',
       youdao: '有道',
-      gpt: 'GPT',
+      gpt: 'LLM',
       sakura: 'Sakura',
     };
     let label = `${idToLaber[translatorDesc.id]}翻译`;

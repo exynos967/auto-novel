@@ -14,7 +14,7 @@ const translatorId = ref<TranslatorId>('sakura');
 const translationOptions: { label: string; value: TranslatorId }[] = [
   { label: '百度', value: 'baidu' },
   { label: '有道', value: 'youdao' },
-  { label: 'GPT', value: 'gpt' },
+  { label: 'LLM', value: 'gpt' },
   { label: 'Sakura', value: 'sakura' },
 ];
 
@@ -51,7 +51,7 @@ const translate = async () => {
       (it) => it.id === selectedGptWorkerId.value,
     );
     if (worker === undefined) {
-      message.error('未选择GPT翻译器');
+      message.error('未选择LLM翻译器');
       return;
     }
     selectedWorker = worker;

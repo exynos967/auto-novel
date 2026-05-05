@@ -133,7 +133,7 @@ const menuOptions = computed<MenuOption[]>(() => {
           key: '/workspace/toolbox',
         },
         {
-          label: renderLabel('GPT工作区', '/workspace/gpt'),
+          label: renderLabel('LLM工作区', '/workspace/gpt'),
           key: '/workspace/gpt',
         },
         {

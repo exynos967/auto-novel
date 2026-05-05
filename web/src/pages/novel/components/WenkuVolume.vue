@@ -85,7 +85,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
 
       <n-text depth="3">
         总计 {{ volume.total }} / 百度 {{ volume.baidu }} / 有道
-        {{ volume.youdao }} / GPT {{ volume.gpt }} / Sakura {{ volume.sakura }}
+        {{ volume.youdao }} / LLM {{ volume.gpt }} / Sakura {{ volume.sakura }}
       </n-text>
 
       <n-flex :size="8">
@@ -106,7 +106,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
 
         <c-button
           v-if="setting.enabledTranslator.includes('gpt')"
-          label="排队GPT"
+          label="排队LLM"
           size="tiny"
           secondary
           @action="submitJob('gpt')"

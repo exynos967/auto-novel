@@ -126,7 +126,7 @@ const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
   <c-modal
     :show="show"
     @update:show="$emit('update:show', $event)"
-    :title="verb + 'GPT翻译器'"
+    :title="verb + 'LLM翻译器'"
   >
     <n-form
       ref="form"
