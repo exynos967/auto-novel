@@ -54,10 +54,12 @@ data class User(
     val createdAt: Instant,
 )
 
-fun Application.authentication(secret: String) = install(Authentication) {
+private const val DEFAULT_JWT_SECRET = "a-string-secret-at-least-256-bits-long"
+
+fun Application.authentication() = install(Authentication) {
     jwt {
         verifier(
-            JWT.require(Algorithm.HMAC256(secret.ifBlank { "a-string-secret-at-least-256-bits-long" })).build()
+            JWT.require(Algorithm.HMAC256(DEFAULT_JWT_SECRET)).build()
         )
         validate { credential ->
             if (credential.subject != null) {

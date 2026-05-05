@@ -40,9 +40,6 @@ import org.koin.logger.slf4jLogger
 private fun env(name: String): String? =
     System.getenv(name)
 
-private fun envNotNull(name: String): String =
-    System.getenv(name) ?: ""
-
 private fun envDbHost(name: String) =
     env(name) ?: env("DB_HOST_TEST") ?: "localhost"
 
@@ -56,7 +53,7 @@ fun main() {
             slf4jLogger()
             modules(appModule)
         }
-        authentication(secret = envNotNull("ACCESS_TOKEN_SECRET"))
+        authentication()
         rateLimit()
         install(Resources)
         install(CachingHeaders)
@@ -121,7 +118,6 @@ val appModule = module {
     single {
         WebNovelHttpDataSource(
             httpsProxy = env("HTTPS_PROXY"),
-            hamelnToken = env("HAMELN_TOKEN"),
             pixivPhpsessid = env("PIXIV_COOKIE_PHPSESSID"),
         )
     }

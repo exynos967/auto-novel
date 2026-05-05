@@ -22,11 +22,6 @@ services:
       - redis
     environment:
       - HTTPS_PROXY
-      - MAILGUN_API_KEY
-      - MAILGUN_API_URL
-      - MAILGUN_FROM_EMAIL
-      - ACCESS_TOKEN_SECRET
-      - HAMELN_TOKEN
       - PIXIV_COOKIE_PHPSESSID
       - DB_HOST_MONGO=mongo
       - DB_HOST_ES=elasticsearch

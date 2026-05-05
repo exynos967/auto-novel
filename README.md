@@ -21,16 +21,7 @@ git clone https://github.com/auto-novel/auto-novel.git
 cd auto-novel
 
 # 2. 生成环境变量配置
-cat > .env << EOF
-HTTPS_PROXY=              # web 小说代理，可以为空
-PIXIV_COOKIE_PHPSESSID=   # Pixiv Cookie，用于爬取P站小说，可以为空
-
-# 以下字段个人部署不需要填写
-ACCESS_TOKEN_SECRET=
-MAILGUN_API_KEY=
-MAILGUN_API_URL=https://api.eu.mailgun.net/v3/verify.fishhawk.top/messages
-MAILGUN_FROM_EMAIL=postmaster@verify.fishhawk.top
-EOF
+cp .env.example .env
 
 # 3. 启动服务
 mkdir -p -m 777 ./data/es/data ./data/es/plugins
