@@ -2,7 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import { HTTPError } from 'ky';
 
 import { useLocalStorage } from '../useStorage';
-import { AuthApi } from './api';
+import { AuthApi, isAuthEnabled } from './api';
 export { AuthUrl } from './api';
 
 type UserRole = 'admin' | 'trusted' | 'member' | 'restricted' | 'banned';
@@ -122,10 +122,8 @@ function useUserDataWithAuth(app: string) {
 }
 
 export function useUserData(app: string) {
-  const mode = import.meta.env.VITE_API_MODE;
-  if (mode === 'local' || mode === 'native') {
-    return useUserDataWithoutAuth(app);
-  } else {
+  if (isAuthEnabled()) {
     return useUserDataWithAuth(app);
   }
+  return useUserDataWithoutAuth(app);
 }

@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE_OWNER: auto-novel
+  IMAGE_OWNER: exynos967
   IMAGE_NAME: auto-novel-web
 
 jobs:
@@ -44,5 +44,5 @@ jobs:
       - uses: actions/delete-package-versions@v5
         with:
           package-name: ${{ env.IMAGE_NAME }}
-          package-type: "container"
+          package-type: 'container'
           min-versions-to-keep: 1
