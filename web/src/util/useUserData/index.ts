@@ -3,7 +3,7 @@ import { HTTPError } from 'ky';
 
 import { useLocalStorage } from '../useStorage';
 import { AuthApi, isAuthEnabled } from './api';
-export { AuthUrl } from './api';
+export { AuthUrl, isAuthEnabled } from './api';
 
 type UserRole = 'admin' | 'trusted' | 'member' | 'restricted' | 'banned';
 

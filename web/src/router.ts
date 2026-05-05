@@ -252,7 +252,7 @@ const router = createRouter({
 
         {
           path: '/admin',
-          redirect: '/admin/user',
+          redirect: '/admin/operation',
           component: () => import('./pages/admin/AdminLayout.vue'),
           children: [
             {
