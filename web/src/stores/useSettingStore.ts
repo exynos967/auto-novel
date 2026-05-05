@@ -9,8 +9,6 @@ export interface Setting {
   //
   tocCollapseInNarrowScreen: boolean;
   tocExpandAll: boolean;
-  hideCommmentWebNovel: boolean;
-  hideCommmentWenkuNovel: boolean;
   showTagInWebFavored: boolean;
   favoriteCreateTimeFirst: boolean;
   //
@@ -44,8 +42,6 @@ export namespace Setting {
     //
     tocCollapseInNarrowScreen: true,
     tocExpandAll: true,
-    hideCommmentWebNovel: false,
-    hideCommmentWenkuNovel: false,
     showTagInWebFavored: false,
     favoriteCreateTimeFirst: false,
     //

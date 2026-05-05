@@ -6,33 +6,10 @@ import { container } from '@mdit/plugin-container';
 import { NRate } from 'naive-ui';
 import { h, render } from 'vue';
 
-const props = defineProps<{
-  mode: 'article' | 'comment';
+defineProps<{
+  mode: 'article';
   source: string;
 }>();
-
-const getRules = (mode: 'article' | 'comment') => {
-  if (mode === 'article') {
-    return [];
-  } else if (mode === 'comment') {
-    return [
-      'backticks',
-      'blockquote',
-      'code',
-      'entity',
-      'escape',
-      'fence',
-      'heading',
-      'hr',
-      'image',
-      'lheading',
-      'reference',
-      'table',
-    ];
-  } else {
-    return mode satisfies never;
-  }
-};
 
 const md = new MarkdownIt({
   html: false,
@@ -72,7 +49,7 @@ const md = new MarkdownIt({
       return `<p><div class="starRating" data-star=${starValue}></div></p>`;
     },
   })
-  .disable(getRules(props.mode));
+  .disable([]);
 
 // 将 class=starRating 渲染为rating 组件
 onMounted(() => {

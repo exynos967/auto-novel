@@ -59,12 +59,6 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
       :glossary="novel.glossary"
     />
 
-    <comment-list
-      v-if="!setting.hideCommmentWebNovel"
-      :site="`web-${providerId}-${novelId}`"
-      :locked="false"
-    />
-
     <template #sidebar>
       <section-header title="目录">
         <c-button

@@ -5,7 +5,7 @@ import { useDraftStore } from '@/stores';
 import { useIsWideScreen } from '@/pages/util';
 
 const props = defineProps<{
-  mode: 'article' | 'comment';
+  mode: 'article';
   draftId?: string;
   autosize?:
     | boolean

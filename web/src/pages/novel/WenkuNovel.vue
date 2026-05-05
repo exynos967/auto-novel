@@ -6,7 +6,7 @@ import { WenkuNovelRepo } from '@/repos';
 import coverPlaceholder from '@/image/cover_placeholder.png';
 import { GenericNovelId } from '@/model/Common';
 import { doAction, useIsWideScreen } from '@/pages/util';
-import { useSettingStore, useWhoamiStore } from '@/stores';
+import { useWhoamiStore } from '@/stores';
 import type { VolumeJpDto } from '@/model/WenkuNovel';
 
 const { novelId } = defineProps<{ novelId: string }>();
@@ -19,9 +19,6 @@ const [DefineTagGroup, ReuseTagGroup] = createReusableTemplate<{
 const isWideScreen = useIsWideScreen(600);
 const message = useMessage();
 const vars = useThemeVars();
-
-const settingStore = useSettingStore();
-const { setting } = storeToRefs(settingStore);
 
 const whoamiStore = useWhoamiStore();
 const { whoami } = storeToRefs(whoamiStore);
@@ -275,12 +272,6 @@ function sortJpVolumes(volumeJp: VolumeJpDto[]) {
         />
       </template>
       <n-p v-else>游客无法查看内容，请先登录。</n-p>
-
-      <comment-list
-        v-if="!setting.hideCommmentWenkuNovel"
-        :site="`wenku-${novelId}`"
-        :locked="false"
-      />
     </template>
 
     <CResultX v-else :error="error" title="加载错误" />

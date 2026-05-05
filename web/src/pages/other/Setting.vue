@@ -77,13 +77,6 @@ const playSound = (source: string) => {
               不影响无分章的网络小说
             </n-tooltip>
           </n-checkbox>
-          <b>评论</b>
-          <n-checkbox v-model:checked="setting.hideCommmentWebNovel">
-            隐藏网络小说评论
-          </n-checkbox>
-          <n-checkbox v-model:checked="setting.hideCommmentWenkuNovel">
-            隐藏文库小说评论
-          </n-checkbox>
           <b>收藏夹</b>
           <n-checkbox v-model:checked="setting.showTagInWebFavored">
             显示收藏夹里网络小说的标签

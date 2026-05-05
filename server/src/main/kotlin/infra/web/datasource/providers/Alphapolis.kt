@@ -24,6 +24,12 @@ class Alphapolis(
         }
     }
 
+    private fun getMetadataUrl(novelId: String): String =
+        "https://www.alphapolis.co.jp/novel/${novelId.split("-").joinToString("/")}"
+
+    private fun getEpisodeUrl(novelId: String, chapterId: String): String =
+        "${getMetadataUrl(novelId)}/episode/$chapterId"
+
     override suspend fun getMetadata(novelId: String): RemoteNovelMetadata {
         val doc = client.get(getMetadataUrl(novelId)).document()
 

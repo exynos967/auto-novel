@@ -1,5 +1,4 @@
 export * from './useAdmin';
-export * from './useComment';
 export * from './useReadPosition';
 export * from './useTranslationCache';
 export * from './useWebNovel';

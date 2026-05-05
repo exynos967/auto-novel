@@ -195,10 +195,4 @@ const { expandedNames, hasSeparators, isAnyExpanded, toggleAll, tocSections } =
       />
     </div>
   </c-drawer-right>
-
-  <comment-list
-    v-if="!setting.hideCommmentWebNovel"
-    :site="`web-${providerId}-${novelId}`"
-    :locked="false"
-  />
 </template>
