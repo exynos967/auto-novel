@@ -171,18 +171,6 @@ const router = createRouter({
         },
 
         {
-          path: '/rank/web/:providerId/:typeId',
-          meta: { title: '小说排行' },
-          component: () => import('./pages/list/WebNovelRank.vue'),
-          props: (route) => ({
-            providerId: route.params.providerId as string,
-            typeId: route.params.typeId as string,
-            page: Number(route.query.page) || 1,
-            selected: parseSelected(route.query),
-          }),
-        },
-
-        {
           path: '/workspace',
           redirect: '/workspace/sakura',
           children: [

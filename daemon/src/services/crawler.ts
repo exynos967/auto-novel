@@ -1,8 +1,6 @@
 import type {
-  Page,
   ProviderId,
   RemoteChapter,
-  RemoteNovelListItem,
   RemoteNovelMetadata,
   WebNovelProvider,
 } from '@auto-novel/crawler';
@@ -76,15 +74,6 @@ export class CrawlerService {
   ): Promise<RemoteNovelMetadata | null> {
     return this.fetchResource(providerId, (provider) =>
       provider.getMetadata(novelId),
-    );
-  }
-
-  async getRank(
-    providerId: ProviderId,
-    params: Record<string, string>,
-  ): Promise<Page<RemoteNovelListItem> | null> {
-    return this.fetchResource(providerId, (provider) =>
-      provider.getRank(params),
     );
   }
 

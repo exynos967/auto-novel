@@ -45,14 +45,6 @@ const listNovel = ({
     })
     .json<Page<WebNovelOutlineDto>>();
 
-const listRank = (providerId: string, params: { [key: string]: string }) =>
-  client
-    .get(`novel/rank/${providerId}`, {
-      searchParams: params,
-      timeout: 20000,
-    })
-    .json<Page<WebNovelOutlineDto>>();
-
 const getNovel = (providerId: string, novelId: string) =>
   client.get(`novel/${providerId}/${novelId}`).json<WebNovelDto>();
 
@@ -189,7 +181,6 @@ const createFileUrl = ({
 
 export const WebNovelApi = {
   listNovel,
-  listRank,
 
   getNovel,
   getChapter,

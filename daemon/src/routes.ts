@@ -29,19 +29,6 @@ router.get('/metadata', async (req, res) => {
   res.json(ret);
 });
 
-router.get('/rank', async (req, res) => {
-  const { providerId, novelId } = req.params as any;
-  const providerInitFn = Providers[providerId];
-  if (!providerInitFn) {
-    res.status(400).send({ error: 'Unknown providerId' });
-    return;
-  }
-  const client = getClientWithProxy(DEBUG_PROXY);
-  const provider = providerInitFn(client);
-  const ret = await provider.getRank(req.body);
-  res.json(ret);
-});
-
 router.get('/:chapterId/chapter', async (req, res) => {
   const { providerId, novelId, chapterId } = req.params as any;
   const providerInitFn = Providers[providerId];

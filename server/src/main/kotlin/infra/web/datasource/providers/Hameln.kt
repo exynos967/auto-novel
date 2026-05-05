@@ -1,7 +1,5 @@
 package infra.web.datasource.providers
 
-import infra.common.Page
-import infra.common.emptyPage
 import infra.web.WebNovelAttention
 import infra.web.WebNovelAuthor
 import infra.web.WebNovelType
@@ -38,10 +36,6 @@ class Hameln(
 
     private val baseUrl =
         if (useProxy) URL_PROXY else URL_ORIGIN
-
-    override suspend fun getRank(options: Map<String, String>): Page<RemoteNovelListItem> {
-        return emptyPage()
-    }
 
     override suspend fun getMetadata(novelId: String): RemoteNovelMetadata {
         val (doc1, doc2) = coroutineScope {

@@ -1,26 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
 import { Kakuyomu } from '@/provider/kakuyomu';
-import {
-  Page,
-  RemoteNovelListItem,
-  WebNovelType,
-  type RemoteChapter,
-} from '@/provider/types';
+import { WebNovelType, type RemoteChapter } from '@/provider/types';
 import { client } from './utils';
 
 describe('kakuyomu', () => {
   const provider = new Kakuyomu(client);
-
-  test('rank', async () => {
-    const data: Page<RemoteNovelListItem> = await provider.getRank({
-      genre: '综合',
-      range: '总计',
-      status: '全部',
-    });
-    expect(data?.items).toBeDefined();
-    expect(data.items.length).toBeGreaterThan(0);
-  });
 
   test('metadata', async () => {
     // TS衛生兵さんの成り上がり

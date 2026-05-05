@@ -1,7 +1,5 @@
 package infra.web.datasource.providers
 
-import infra.common.Page
-import infra.common.emptyPage
 import infra.web.WebNovelAttention
 import infra.web.WebNovelAuthor
 import infra.web.WebNovelType
@@ -24,18 +22,6 @@ class Alphapolis(
                 Cookie(name = "_pubcid", value = "8807a80b-fc00-4c56-b151-95e6780d9f8f", domain = ".alphapolis.co.jp")
             )
         }
-    }
-
-    override suspend fun getRank(options: Map<String, String>): Page<RemoteNovelListItem> {
-        return emptyPage()
-    }
-
-    private fun getMetadataUrl(novelId: String): String {
-        return "https://www.alphapolis.co.jp/novel/" + novelId.split('-').joinToString("/")
-    }
-
-    private fun getEpisodeUrl(novelId: String, chapterId: String): String {
-        return getMetadataUrl(novelId) + "/episode/" + chapterId
     }
 
     override suspend fun getMetadata(novelId: String): RemoteNovelMetadata {

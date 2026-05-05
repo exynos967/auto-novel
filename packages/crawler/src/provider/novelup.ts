@@ -4,9 +4,7 @@ import type { KyInstance } from 'ky';
 import { parseJapanDateString } from '@/utils';
 
 import {
-  type Page,
   type RemoteChapter,
-  type RemoteNovelListItem,
   type RemoteNovelMetadata,
   type TocItem,
   type WebNovelAuthor,
@@ -38,12 +36,6 @@ export class Novelup implements WebNovelProvider {
 
   constructor(client: KyInstance) {
     this.client = client;
-  }
-
-  async getRank(
-    _options: Record<string, string>,
-  ): Promise<Page<RemoteNovelListItem>> {
-    throw new Error('Not implemented');
   }
 
   async getMetadata(novelId: string): Promise<RemoteNovelMetadata | null> {

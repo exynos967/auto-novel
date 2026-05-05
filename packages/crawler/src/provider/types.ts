@@ -30,40 +30,18 @@ export type ResponseLike = {
   text: () => Promise<any>;
 };
 
-export interface WebNovelProvider<GetRankOptionsT = Record<string, string>> {
+export interface WebNovelProvider {
   readonly id: string;
   readonly version: string;
 
   client: KyInstance;
 
-  getRank(
-    options: GetRankOptionsT,
-  ): Promise<Page<RemoteNovelListItem> | null | undefined>;
   getMetadata(novelId: string): Promise<RemoteNovelMetadata | null | undefined>;
   getChapter(
     novelId: string,
     chapterId: string,
   ): Promise<RemoteChapter | null | undefined>;
 }
-
-export type Page<T> = {
-  items: T[];
-  pageNumber: number;
-};
-
-export const emptyPage = <T>() =>
-  <Page<T>>{
-    items: [],
-    pageNumber: 0,
-  };
-
-export type RemoteNovelListItem = {
-  novelId: string;
-  title: string;
-  attentions: WebNovelAttention[];
-  keywords: string[];
-  extra: string;
-};
 
 export enum WebNovelAttention {
   R15 = 'R15',

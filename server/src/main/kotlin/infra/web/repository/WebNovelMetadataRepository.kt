@@ -13,7 +13,6 @@ import infra.web.datasource.WebNovelEsDataSource
 import infra.web.datasource.WebNovelHttpDataSource
 import infra.web.datasource.providers.Hameln
 import infra.web.datasource.providers.Pixiv
-import infra.web.datasource.providers.RemoteNovelListItem
 import infra.web.datasource.providers.Syosetu
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
@@ -57,22 +56,6 @@ class WebNovelMetadataRepository(
             eq(WebNovel::providerId.field(), providerId),
             eq(WebNovel::novelId.field(), novelId),
         )
-
-    suspend fun listRank(
-        providerId: String,
-        options: Map<String, String>,
-    ): Result<Page<WebNovelListItem>> {
-        return provider
-            .listRank(providerId, options)
-            .map { rank ->
-                rank.map { remote ->
-                    val local = webNovelMetadataCollection
-                        .find(byId(providerId, remote.novelId))
-                        .firstOrNull()
-                    remote.toOutline(providerId, local)
-                }
-            }
-    }
 
     suspend fun search(
         userId: String?,
@@ -422,28 +405,6 @@ class WebNovelMetadataRepository(
             )
     }
 }
-
-private fun RemoteNovelListItem.toOutline(
-    providerId: String,
-    novel: WebNovel?,
-) =
-    WebNovelListItem(
-        providerId = providerId,
-        novelId = novelId,
-        titleJp = title,
-        titleZh = novel?.titleZh,
-        type = null,
-        attentions = attentions,
-        keywords = keywords,
-        total = novel?.toc?.count { it.chapterId != null }?.toLong() ?: 0,
-        jp = novel?.jp ?: 0,
-        baidu = novel?.baidu ?: 0,
-        youdao = novel?.youdao ?: 0,
-        gpt = novel?.gpt ?: 0,
-        sakura = novel?.sakura ?: 0,
-        extra = extra,
-        updateAt = novel?.updateAt,
-    )
 
 fun WebNovel.toOutline(
     favored: String? = null,

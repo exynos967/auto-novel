@@ -20,12 +20,6 @@ class KakuyomuTest : DescribeSpec(), KoinTest {
     private val provider get() = dataSource.providers[Kakuyomu.id]!!
 
     init {
-        describe("getRank") {
-            it("常规") {
-                provider.getRank(mapOf("genre" to "综合", "range" to "每周"))
-            }
-        }
-
         describe("getMetadata") {
             it("常规") {
                 // https://kakuyomu.jp/works/1177354054892870623

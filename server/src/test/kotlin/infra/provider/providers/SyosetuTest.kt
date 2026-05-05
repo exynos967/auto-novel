@@ -5,7 +5,6 @@ import infra.web.datasource.WebNovelHttpDataSource
 import infra.web.datasource.providers.Syosetu
 import infra.web.WebNovelAttention
 import infra.web.WebNovelType
-import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldHaveAtLeastSize
@@ -23,20 +22,6 @@ class SyosetuTest : DescribeSpec(), KoinTest {
     private val provider get() = dataSource.providers[Syosetu.id]!!
 
     init {
-        describe("getRank") {
-            it("常规") {
-                shouldNotThrow<Throwable> {
-                    provider.getRank(
-                        mapOf(
-                            "type" to "流派",
-                            "genre" to "恋爱：异世界",
-                            "range" to "每月",
-                        )
-                    )
-                }
-            }
-        }
-
         describe("getMetadata") {
             it("常规") {
                 // https://ncode.syosetu.com/n9669bk

@@ -19,7 +19,6 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.resources.*
 import io.ktor.server.plugins.*
-import io.ktor.server.plugins.cachingheaders.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.*
 import io.ktor.server.resources.post
@@ -70,9 +69,6 @@ private class WebNovelRes {
         val sort: Int = 0,
         val query: String? = null,
     )
-
-    @Resource("/rank/{providerId}")
-    class Rank(val parent: WebNovelRes, val providerId: String)
 
     @Resource("/{providerId}/{novelId}")
     class Id(val parent: WebNovelRes, val providerId: String, val novelId: String) {
@@ -152,15 +148,6 @@ fun Route.routeWebNovel() {
             }
         }
     }
-    get<WebNovelRes.Rank> { loc ->
-        val options = call.request.queryParameters.toMap().mapValues { it.value.first() }
-        call.tryRespond {
-            val rank = service.listRank(providerId = loc.providerId, options = options)
-            call.caching = CachingOptions(CacheControl.MaxAge(maxAgeSeconds = 3600 * 2))
-            rank
-        }
-    }
-
     // Get
     authenticateDb(optional = true) {
         get<WebNovelRes.Id> { loc ->
@@ -464,16 +451,6 @@ class WebNovelApi(
                 page = page,
                 pageSize = pageSize,
             )
-            .map { it.asDto() }
-    }
-
-    suspend fun listRank(
-        providerId: String,
-        options: Map<String, String>,
-    ): Page<WebNovelOutlineDto> {
-        return metadataRepo
-            .listRank(providerId, options)
-            .getOrElse { throwInternalServerError("从源站获取失败:" + it.message) }
             .map { it.asDto() }
     }
 

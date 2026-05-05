@@ -1,7 +1,5 @@
 package infra.web.datasource.providers
 
-import infra.common.Page
-import infra.common.emptyPage
 import infra.web.WebNovelAttention
 import infra.web.WebNovelAuthor
 import infra.web.WebNovelType
@@ -25,10 +23,6 @@ class Pixiv(
                 Cookie(name = "PHPSESSID", value = phpsessid, domain = ".pixiv.net")
             )
         }
-    }
-
-    override suspend fun getRank(options: Map<String, String>): Page<RemoteNovelListItem> {
-        return emptyPage()
     }
 
     override suspend fun getMetadata(novelId: String): RemoteNovelMetadata {

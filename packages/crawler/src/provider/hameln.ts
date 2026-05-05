@@ -4,9 +4,7 @@ import type { KyInstance } from 'ky';
 import { parseJapanDateString } from '@/utils';
 
 import {
-  type Page,
   type RemoteChapter,
-  type RemoteNovelListItem,
   type RemoteNovelMetadata,
   type TocItem,
   WebNovelAttention,
@@ -58,12 +56,6 @@ export class Hameln implements WebNovelProvider {
 
   setOptions(options: typeof this.options) {
     this.options = options;
-  }
-
-  async getRank(
-    _options: Record<string, string>,
-  ): Promise<Page<RemoteNovelListItem>> {
-    throw new Error('Not implemented');
   }
 
   async getMetadata(novelId: string): Promise<RemoteNovelMetadata | null> {

@@ -5,7 +5,6 @@ import { withOnSuccess } from './cache';
 
 const ItemKey = 'web-novel';
 const ListKey = 'web-novel-list';
-const ListRankKey = 'web-novel-list-rank';
 const ListHistoryKey = 'web-novel-list-history';
 const ListFavoredKey = 'web-novel-list-favored';
 
@@ -39,15 +38,6 @@ const useWebNovelList = (
         pageSize: 20,
         ...toValue(option),
       }),
-  });
-
-const useWebNovelRankList = (
-  providerId: MaybeRefOrGetter<string>,
-  params: MaybeRefOrGetter<{ [key: string]: string }>,
-) =>
-  useQuery({
-    key: () => [ListRankKey, toValue(providerId), toValue(params)],
-    query: () => WebNovelApi.listRank(toValue(providerId), toValue(params)),
   });
 
 const useWebNovelHistoryList = (page: MaybeRefOrGetter<number>) =>
@@ -90,7 +80,6 @@ const useWebNovelFavoredList = (
 export const WebNovelRepo = {
   useWebNovel,
   useWebNovelList,
-  useWebNovelRankList,
   useWebNovelHistoryList,
   useWebNovelFavoredList,
 

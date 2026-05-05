@@ -12,16 +12,13 @@ import z from 'zod';
 
 export { Alphapolis, Hameln, Kakuyomu, Novelup, Pixiv, Syosetu };
 export type {
-  Page,
   RemoteChapter,
-  RemoteNovelListItem,
   RemoteNovelMetadata,
   TocItem,
   WebNovelAuthor,
   WebNovelProvider,
 } from '@/provider/types';
 export {
-  emptyPage,
   NovelAccessDeniedException,
   NovelIdShouldBeReplacedException,
   NovelRateLimitedException,

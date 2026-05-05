@@ -1,6 +1,5 @@
 package infra.web.datasource.providers
 
-import infra.common.Page
 import infra.web.WebNovelAttention
 import infra.web.WebNovelAuthor
 import infra.web.WebNovelType
@@ -38,16 +37,7 @@ data class RemoteChapter(
     val paragraphs: List<String>,
 )
 
-data class RemoteNovelListItem(
-    val novelId: String,
-    val title: String,
-    val attentions: List<WebNovelAttention>,
-    val keywords: List<String>,
-    val extra: String,
-)
-
 interface WebNovelProvider {
-    suspend fun getRank(options: Map<String, String>): Page<RemoteNovelListItem>
     suspend fun getMetadata(novelId: String): RemoteNovelMetadata
     suspend fun getChapter(novelId: String, chapterId: String): RemoteChapter
 }

@@ -6,77 +6,14 @@ import pLimit from 'p-limit';
 import { parseJapanDateString } from '@/utils';
 
 import {
-  type Page,
   type RemoteChapter,
-  type RemoteNovelListItem,
   type RemoteNovelMetadata,
   type TocItem,
   type WebNovelAuthor,
   type WebNovelProvider,
   WebNovelAttention,
   WebNovelType,
-  emptyPage,
 } from './types';
-
-const RANGE_IDS = {
-  每日: 'daily',
-  每周: 'weekly',
-  每月: 'monthly',
-  季度: 'quarter',
-  每年: 'yearly',
-  总计: 'total',
-} as const;
-
-const STATUS_IDS = {
-  全部: 'total',
-  短篇: 't',
-  连载: 'r',
-  完结: 'er',
-} as const;
-
-const GENRE_IDS_V1 = {
-  '恋爱：异世界': '101',
-  '恋爱：现实世界': '102',
-  '幻想：高幻想': '201',
-  '幻想：低幻想': '202',
-  '文学：纯文学': '301',
-  '文学：人性剧': '302',
-  '文学：历史': '303',
-  '文学：推理': '304',
-  '文学：恐怖': '305',
-  '文学：动作': '306',
-  '文学：喜剧': '307',
-  '科幻：VR游戏': '401',
-  '科幻：宇宙': '402',
-  '科幻：空想科学': '403',
-  '科幻：惊悚': '404',
-  '其他：童话': '9901',
-  '其他：诗': '9902',
-  '其他：散文': '9903',
-  '其他：其他': '9999',
-} as const;
-
-const GENRE_IDS_V2 = {
-  恋爱: '1',
-  幻想: '2',
-  '文学/科幻/其他': 'o',
-} as const;
-
-type GetRankOptions = {
-  range: keyof typeof RANGE_IDS;
-  status: keyof typeof STATUS_IDS;
-  page: string;
-} & (
-  | {
-      type: '流派';
-      genre: keyof typeof GENRE_IDS_V1;
-    }
-  | { type: '综合' }
-  | {
-      type: '异世界转生/转移';
-      genre: keyof typeof GENRE_IDS_V2;
-    }
-);
 
 function parseAttention(tag: string): WebNovelAttention | undefined {
   switch (tag.trim()) {
@@ -122,7 +59,7 @@ function hrefLastSegment(href: string | undefined): string | undefined {
   return index === -1 ? normalized : normalized.slice(index + 1);
 }
 
-export class Syosetu implements WebNovelProvider<GetRankOptions> {
+export class Syosetu implements WebNovelProvider {
   readonly id = 'syosetu';
   readonly version = '2.0.0';
 
@@ -141,92 +78,6 @@ export class Syosetu implements WebNovelProvider<GetRankOptions> {
     this.client = client;
     this.options = {
       concurrency: Math.max(1, Math.floor(options?.concurrency ?? 1)),
-    };
-  }
-
-  async getRank(options: GetRankOptions): Promise<Page<RemoteNovelListItem>> {
-    const rangeId = RANGE_IDS[options['range']];
-    if (!rangeId) return emptyPage();
-
-    const statusId = STATUS_IDS[options['status']];
-    if (!statusId) return emptyPage();
-
-    let path = '';
-    switch (options['type']) {
-      case '流派': {
-        const genreId = GENRE_IDS_V1[options['genre']];
-        if (!genreId) return emptyPage();
-        path = `genrelist/type/${rangeId}_${genreId}_${statusId}`;
-        break;
-      }
-      case '综合':
-        path = `list/type/${rangeId}_${statusId}`;
-        break;
-      case '异世界转生/转移': {
-        const genreId = GENRE_IDS_V2[options['genre']];
-        if (!genreId) return emptyPage();
-        path = `isekailist/type/${rangeId}_${genreId}_${statusId}`;
-        break;
-      }
-      default:
-        break;
-    }
-    if (!path) return emptyPage();
-
-    const page = Number(options['page']);
-    if (!Number.isFinite(page) || page < 1) return emptyPage();
-
-    const $ = await this.client
-      .get(`https://yomou.syosetu.com/rank/${path}/?p=${page}`)
-      .text()
-      .then((text) => cheerio.load(text));
-
-    const maxPage = Math.max(0, $('.c-pager').first().children().length - 2);
-    const items = $('.p-ranklist-item')
-      .map((_, item) => {
-        const root = $(item);
-        const titleLink = root.find('div.p-ranklist-item__title > a').first();
-
-        const attentions: WebNovelAttention[] = [];
-        const keywords: string[] = [];
-        root
-          .find('div.p-ranklist-item__keyword')
-          .first()
-          .find('a')
-          .each((_, tagEl) => {
-            const tag = $(tagEl).text().trim();
-            const attention = parseAttention(tag);
-            if (attention) {
-              attentions.push(attention);
-            } else if (tag) {
-              keywords.push(tag);
-            }
-          });
-
-        const extra = [
-          ...root.find('div.p-ranklist-item__points').toArray(),
-          ...root
-            .find('div.p-ranklist-item__infomation .p-ranklist-item__separator')
-            .toArray(),
-        ]
-          .map((el) => $(el).text().trim())
-          .filter(Boolean)
-          .join(' / ');
-
-        return {
-          novelId: hrefLastSegment(titleLink.attr('href')) ?? '',
-          title: titleLink.text().trim(),
-          attentions,
-          keywords,
-          extra,
-        } satisfies RemoteNovelListItem;
-      })
-      .get()
-      .filter((item) => item.novelId && item.title);
-
-    return {
-      items,
-      pageNumber: maxPage,
     };
   }
 

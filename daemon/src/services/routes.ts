@@ -30,25 +30,6 @@ export function createCrawlerRouter(crawlerService: CrawlerService): Router {
   );
 
   router.get(
-    '/rank/:providerId',
-    asyncHandler(async (req, res) => {
-      const { providerId } = rankParamsSchema.parse(req.params);
-      const normalizedQuery = normalizeQuery(
-        req.query as Record<string, string | string[] | undefined>,
-      );
-      const validatedQuery = rankQuerySchema.parse(normalizedQuery);
-      const filteredQuery = Object.fromEntries(
-        Object.entries(validatedQuery).filter(
-          ([, value]) => value !== undefined,
-        ),
-      ) as Record<string, string>;
-      console.log(providerId, filteredQuery);
-      const entity = await crawlerService.getRank(providerId, filteredQuery);
-      res.json(entity);
-    }),
-  );
-
-  router.get(
     '/chapter/:providerId/:novelId/:chapterId',
     asyncHandler(async (req, res) => {
       const { providerId, novelId, chapterId } = chapterParamsSchema.parse(
@@ -124,22 +105,6 @@ function isUnknownProviderError(error: unknown): error is Error {
   );
 }
 
-function normalizeQuery(query: Record<string, string | string[] | undefined>) {
-  return Object.entries(query).reduce<Record<string, string>>(
-    (acc, [key, value]) => {
-      if (typeof value === 'string') {
-        acc[key] = value;
-      } else if (Array.isArray(value) && value.length > 0) {
-        acc[key] = value[0];
-      } else if (value !== undefined && value !== null) {
-        acc[key] = String(value);
-      }
-      return acc;
-    },
-    {},
-  );
-}
-
 const providerIdSchema = z.enum(PROVIDER_IDS);
 
 const metadataParamsSchema = z.object({
@@ -150,20 +115,3 @@ const metadataParamsSchema = z.object({
 const chapterParamsSchema = metadataParamsSchema.extend({
   chapterId: z.string().min(1),
 });
-
-const rankParamsSchema = z.object({
-  providerId: providerIdSchema,
-});
-
-const rankQuerySchema = z
-  .object({
-    genre: z.string().min(1).optional(),
-    range: z.string().min(1).optional(),
-    status: z.string().min(1).optional(),
-    type: z.string().min(1).optional(),
-    page: z
-      .string()
-      .regex(/^[0-9]+$/)
-      .optional(),
-  })
-  .strict();

@@ -7,7 +7,6 @@ import {
   HistoryOutlined,
   HomeOutlined,
   LanguageOutlined,
-  LocalFireDepartmentOutlined,
   LogOutOutlined,
   MenuOutlined,
   SettingsOutlined,
@@ -91,32 +90,6 @@ const menuOptions = computed<MenuOption[]>(() => {
       label: renderLabel('文库小说', '/wenku'),
       icon: renderIcon(BookOutlined),
       key: '/wenku',
-    },
-    {
-      label: '小说排行',
-      icon: renderIcon(LocalFireDepartmentOutlined),
-      key: '/rank',
-      children: [
-        {
-          label: renderLabel('成为小说家：流派', '/rank/web/syosetu/1'),
-          key: '/rank/web/syosetu/1',
-        },
-        {
-          label: renderLabel('成为小说家：综合', '/rank/web/syosetu/2'),
-          key: '/rank/web/syosetu/2',
-        },
-        {
-          label: renderLabel(
-            '成为小说家：异世界转移/转生',
-            '/rank/web/syosetu/3',
-          ),
-          key: '/rank/web/syosetu/3',
-        },
-        {
-          label: renderLabel('Kakuyomu：流派', '/rank/web/kakuyomu/1'),
-          key: '/rank/web/kakuyomu/1',
-        },
-      ],
     },
     {
       type: 'divider',
@@ -364,7 +337,6 @@ watch(
             'BookshelfWenku',
             'ReadHistoryList',
             'WebNovelList',
-            'WebNovelRank',
             'WenkuNovelList',
           ]"
         >

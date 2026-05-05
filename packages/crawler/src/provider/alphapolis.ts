@@ -2,9 +2,7 @@ import * as cheerio from 'cheerio';
 import type { KyInstance } from 'ky';
 
 import {
-  type Page,
   type RemoteChapter,
-  type RemoteNovelListItem,
   type RemoteNovelMetadata,
   type TocItem,
   type WebNovelAuthor,
@@ -42,12 +40,6 @@ export class Alphapolis implements WebNovelProvider {
 
   constructor(client: KyInstance) {
     this.client = client;
-  }
-
-  async getRank(
-    _options: Record<string, string>,
-  ): Promise<Page<RemoteNovelListItem>> {
-    throw new Error('Not implemented');
   }
 
   private getMetadataUrl(novelId: string): string {

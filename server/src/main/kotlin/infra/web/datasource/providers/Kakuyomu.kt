@@ -1,7 +1,5 @@
 package infra.web.datasource.providers
 
-import infra.common.Page
-import infra.common.emptyPage
 import infra.web.WebNovelAttention
 import infra.web.WebNovelAuthor
 import infra.web.WebNovelType
@@ -18,77 +16,6 @@ class Kakuyomu(
 ) : WebNovelProvider {
     companion object {
         const val id = "kakuyomu"
-        private val rangeIds = mapOf(
-            "每日" to "daily",
-            "每周" to "weekly",
-            "每月" to "monthly",
-            "每年" to "yearly",
-            "总计" to "entire",
-        )
-        private val genreIds = mapOf(
-            "综合" to "all",
-            "异世界幻想" to "fantasy",
-            "现代幻想" to "action",
-            "科幻" to "sf",
-            "恋爱" to "love_story",
-            "浪漫喜剧" to "romance",
-            "现代戏剧" to "drama",
-            "恐怖" to "horror",
-            "推理" to "mystery",
-            "散文·纪实" to "nonfiction",
-            "历史·时代·传奇" to "history",
-            "创作论·评论" to "criticism",
-            "诗·童话·其他" to "others",
-        )
-
-        private val statusIds = mapOf(
-            "全部" to "all",
-            "长篇" to "long",
-            "短篇" to "short",
-        )
-    }
-
-    override suspend fun getRank(options: Map<String, String>): Page<RemoteNovelListItem> {
-        val genre = genreIds[options["genre"]] ?: return emptyPage()
-        val range = rangeIds[options["range"]] ?: return emptyPage()
-        val status = statusIds[options["status"]] ?: return emptyPage()
-        val url = "https://kakuyomu.jp/rankings/${genre}/${range}?work_variation=${status}"
-        val doc = client.get(url).document()
-        val items = doc.select("div.widget-media-genresWorkList-right > div.widget-work").map { workCard ->
-            val a = workCard.selectFirst("a.bookWalker-work-title")!!
-            val novelId = a.attr("href").removePrefix("/works/")
-            val title = a.text()
-
-            val attentions = workCard
-                .select("b.widget-workCard-flags > span")
-                .mapNotNull {
-                    when (it.text()) {
-                        "残酷描写有り" -> WebNovelAttention.残酷描写
-                        "暴力描写有り" -> WebNovelAttention.暴力描写
-                        "性描写有り" -> WebNovelAttention.性描写
-                        else -> null
-                    }
-                }
-
-            val keywords = workCard
-                .select("span.widget-workCard-tags > a")
-                .map { it.text() }
-
-            val extra = workCard.selectFirst("p.widget-workCard-meta")!!.children()
-                .joinToString(" / ") { it.text() }
-
-            RemoteNovelListItem(
-                novelId = novelId,
-                title = title,
-                attentions = attentions,
-                keywords = keywords,
-                extra = extra,
-            )
-        }
-        return Page(
-            items = items,
-            pageNumber = 1L,
-        )
     }
 
     override suspend fun getMetadata(novelId: String): RemoteNovelMetadata {

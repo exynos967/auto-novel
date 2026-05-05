@@ -1,6 +1,5 @@
 package infra.web.datasource
 
-import infra.common.Page
 import infra.web.datasource.providers.*
 import io.ktor.client.*
 import io.ktor.client.engine.*
@@ -131,11 +130,6 @@ class WebNovelHttpDataSource(
             block(provider)
         }
     }
-
-    suspend fun listRank(providerId: String, options: Map<String, String>): Result<Page<RemoteNovelListItem>> =
-        doAction(providerId) {
-            it.getRank(options)
-        }
 
     suspend fun getMetadata(providerId: String, novelId: String): Result<RemoteNovelMetadata> =
         doActionWithLimiter(providerId) {
