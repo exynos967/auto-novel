@@ -1,5 +1,5 @@
-export * from './forum/useBlacklistStore';
-export * from './forum/useDraftStore';
+export * from './comment/useBlacklistStore';
+export * from './common/useDraftStore';
 
 export * from './useFavored';
 export * from './useNoticeStore';

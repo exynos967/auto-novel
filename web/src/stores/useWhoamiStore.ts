@@ -28,7 +28,6 @@ export const useWhoamiStore = defineStore(LSKey.Auth, () => {
     const atLeastMember =
       profile !== undefined && ['admin', 'member'].includes(profile.role);
     const hasNsfwAccess = atLeastMember && createAtLeast(30);
-    const hasForumAccess = atLeastMember;
     const hasNovelAccess = atLeastMember && createAtLeast(30);
 
     return {
@@ -41,7 +40,6 @@ export const useWhoamiStore = defineStore(LSKey.Auth, () => {
       isAdmin,
       asAdmin,
       hasNsfwAccess,
-      hasForumAccess,
       hasNovelAccess,
       isMe: (username: string) => profile?.username === username,
     };

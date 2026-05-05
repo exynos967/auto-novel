@@ -93,15 +93,8 @@ const clearCache = async () =>
 
     <bulletin>
       <n-flex>
-        <c-a to="/forum/656d60530286f15e3384fcf8" target="_blank">
-          本地部署教程
-        </c-a>
-        /
         <span>
-          <c-a to="/forum/65719bf16843e12bd3a4dc98" target="_blank">
-            AutoDL教程
-          </c-a>
-          :
+          AutoDL:
           <n-a
             href="https://www.autodl.com/console/instance/list"
             target="_blank"

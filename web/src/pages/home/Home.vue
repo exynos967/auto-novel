@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
   BookOutlined,
-  ForumOutlined,
   LanguageOutlined,
   ReadMoreOutlined,
   StarBorderOutlined,
@@ -173,15 +172,6 @@ const githubLink = 'https://github.com/auto-novel/auto-novel';
           </n-flex>
         </n-button>
       </router-link>
-
-      <router-link to="/forum" style="flex: 1">
-        <n-button quaternary style="width: 100%; height: 64px">
-          <n-flex align="center" vertical style="font-size: 12px">
-            <n-icon size="24" :component="ForumOutlined" />
-            论坛
-          </n-flex>
-        </n-button>
-      </router-link>
     </n-flex>
     <div v-else style="height: 16px" />
 
@@ -202,9 +192,7 @@ const githubLink = 'https://github.com/auto-novel/auto-novel';
       <n-p>
         禁止使用脚本绕过翻译器提交翻译文本，哪怕你觉得自己提交的是正经翻译。
       </n-p>
-      <n-p>
-        FishHawk长期996，网站开发速度大幅下降已成常态，论坛反馈目前没有精力维护，有问题加群@吧
-      </n-p>
+      <n-p>有问题或建议请加群反馈。</n-p>
     </bulletin>
 
     <template v-if="whoami.isSignedIn">
@@ -245,11 +233,7 @@ const githubLink = 'https://github.com/auto-novel/auto-novel';
 
   <c-modal title="使用说明" v-model:show="showHowToUseModal">
     <n-p>
-      将小说链接复制到网站首页的输入框里，点击搜索，如果链接正确，将会跳转到小说页面。更高级的用法，例如生成机翻、高级搜索等，参见
-      <c-a to="/forum/64f3d63f794cbb1321145c07">使用教程</c-a>
-      。有什么问题和建议请在
-      <c-a to="/forum">论坛</c-a>
-      中发帖讨论。
+      将小说链接复制到网站首页的输入框里，点击搜索，如果链接正确，将会跳转到小说页面。更高级的用法，例如生成机翻、高级搜索等，请参考项目说明或加群交流。
     </n-p>
     <n-p>支持的小说站如下:</n-p>
     <n-p v-for="[name, link] of linkExample" :key="name">

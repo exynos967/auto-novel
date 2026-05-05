@@ -1,7 +1,6 @@
 package api
 
 import api.plugins.*
-import infra.article.ArticleRepository
 import infra.comment.CommentRepository
 import infra.comment.Comment
 import infra.common.Page
@@ -101,7 +100,6 @@ fun Route.routeComment() {
 
 class CommentApi(
     private val commentRepo: CommentRepository,
-    private val articleRepo: ArticleRepository,
 ) {
     @Serializable
     data class CommentDto(
@@ -172,7 +170,7 @@ class CommentApi(
         user: User,
         id: String,
     ) {
-        user.requireForumAccess()
+        user.requireNovelAccess()
         if (!user.checkCustomRule { commentRepo.isCommentCanRevoke(id = id, userId = user.id) }) {
             throwUnauthorized("没有权限删除当前评论")
         }
@@ -186,11 +184,7 @@ class CommentApi(
         parent: String?,
         content: String,
     ) {
-        if (site.startsWith("article-")) {
-            user.requireForumAccess()
-        } else {
-            user.requireNovelAccess()
-        }
+        user.requireNovelAccess()
         if (content.isBlank()) {
             throwBadRequest("回复内容不能为空")
         }
@@ -201,11 +195,6 @@ class CommentApi(
             throwNotFound("回复的评论不存在")
         }
 
-        if (site.startsWith("article-")) {
-            articleRepo.increaseNumComments(
-                site.removePrefix("article-")
-            )
-        }
         commentRepo.createComment(
             site = site,
             parent = parent,

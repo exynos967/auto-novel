@@ -3,7 +3,6 @@ import {
   BookOutlined,
   CandlestickChartOutlined,
   DarkModeOutlined,
-  ForumOutlined,
   HistoryOutlined,
   HomeOutlined,
   LanguageOutlined,
@@ -120,11 +119,6 @@ const menuOptions = computed<MenuOption[]>(() => {
       ],
     },
     {
-      label: renderLabel('论坛', '/forum'),
-      icon: renderIcon(ForumOutlined),
-      key: '/forum',
-    },
-    {
       label: renderLabel('设置', '/setting'),
       icon: renderIcon(SettingsOutlined),
       key: '/setting',
@@ -158,7 +152,7 @@ const menuOptions = computed<MenuOption[]>(() => {
 
 const menuKey = computed(() => {
   const path = route.path;
-  for (const key of ['/novel', '/wenku', '/favorite', '/forum']) {
+  for (const key of ['/novel', '/wenku', '/favorite']) {
     if (path.startsWith(key)) {
       return key;
     }
@@ -331,7 +325,6 @@ watch(
       <router-view v-slot="{ Component }">
         <keep-alive
           :include="[
-            'Forum',
             'Index',
             'BookshelfWeb',
             'BookshelfWenku',

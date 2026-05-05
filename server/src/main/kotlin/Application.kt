@@ -3,7 +3,6 @@ import api.plugins.authentication
 import api.plugins.contentNegotiation
 import api.plugins.rateLimit
 import infra.*
-import infra.article.ArticleRepository
 import infra.comment.CommentRepository
 import infra.oplog.OperationHistoryRepository
 import infra.web.repository.WebNovelFavoredRepository
@@ -76,7 +75,6 @@ fun main() {
         }
 
         routing {
-            routeArticle()
             routeComment()
             routeOperationHistory()
             //
@@ -127,7 +125,6 @@ val appModule = module {
     singleOf(::WenkuNovelVolumeDiskDataSource)
 
     // Data layer: Repository
-    singleOf(::ArticleRepository)
     singleOf(::CommentRepository)
     singleOf(::OperationHistoryRepository)
 
@@ -145,7 +142,6 @@ val appModule = module {
     singleOf(::WenkuNovelFavoredRepository)
 
     // App Layer
-    singleOf(::ArticleApi)
     singleOf(::CommentApi)
     singleOf(::OperationHistoryApi)
 
