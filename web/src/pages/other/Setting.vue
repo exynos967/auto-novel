@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import SoundAllTaskCompleted from '@/sound/all_task_completed.mp3';
 import {
   Setting,
   useSettingStore,
@@ -21,10 +20,6 @@ const clearWebSearchHistory = () => {
 const clearWenkuSearchHistory = () => {
   useWenkuSearchHistoryStore().clear();
   message.success('清空成功');
-};
-
-const playSound = (source: string) => {
-  return new Audio(source).play();
 };
 </script>
 
@@ -124,26 +119,6 @@ const playSound = (source: string) => {
             v-model:value="setting.enabledTranslator"
             size="small"
           />
-        </n-flex>
-      </n-list-item>
-
-      <n-list-item>
-        <n-flex vertical>
-          <b>工作区语音提醒</b>
-          <n-flex :wrap="false" :size="0">
-            <n-checkbox v-model:checked="setting.workspaceSound">
-              任务全部完成
-            </n-checkbox>
-
-            [
-            <c-button
-              label="点击播放"
-              text
-              type="primary"
-              @action="playSound(SoundAllTaskCompleted)"
-            />
-            ]
-          </n-flex>
         </n-flex>
       </n-list-item>
 

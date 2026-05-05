@@ -166,15 +166,6 @@ const createSakuraWorkspaceStore = () =>
         }
       });
 
-      // 2026-5-5
-      workspace.workers = workspace.workers.filter(
-        (it) =>
-          !(
-            (it.id === '本机' && it.endpoint === 'http://127.0.0.1:8080') ||
-            (it.id === 'AutoDL' && it.endpoint === 'http://127.0.0.1:6006')
-          ),
-      );
-
       // 2025-2-21
       if (
         workspace.workers.find(

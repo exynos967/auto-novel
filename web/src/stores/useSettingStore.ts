@@ -24,7 +24,6 @@ export interface Setting {
     translations: TranslatorId[];
     type: 'epub' | 'txt';
   };
-  workspaceSound: boolean;
   paginationMode: 'pagination' | 'scroll';
   localVolumeOrder: {
     value: 'byCreateAt' | 'byReadAt' | 'byId';
@@ -57,7 +56,6 @@ export namespace Setting {
       translations: ['sakura', 'gpt', 'youdao', 'baidu'],
       type: 'epub',
     },
-    workspaceSound: false,
     paginationMode: 'pagination',
     localVolumeOrder: {
       value: 'byCreateAt',
@@ -84,10 +82,6 @@ export namespace Setting {
       setting.downloadFormat.mode = 'jp-zh';
     } else if ((setting.downloadFormat.mode as string) === 'jp') {
       setting.downloadFormat.mode = 'zh';
-    }
-    // 2024-03-05
-    if (setting.workspaceSound === undefined) {
-      setting.workspaceSound = false;
     }
     // 2024-05-28
     if ((setting.paginationMode as unknown) === 'auto') {

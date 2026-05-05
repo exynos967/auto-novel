@@ -6,13 +6,9 @@ import { SakuraTranslator } from '@/domain/translate';
 import { TranslationCacheRepo } from '@/repos';
 import type { TranslateJob } from '@/model/Translator';
 import { doAction } from '@/pages/util';
-import SoundAllTaskCompleted from '@/sound/all_task_completed.mp3';
-import { useSakuraWorkspaceStore, useSettingStore } from '@/stores';
+import { useSakuraWorkspaceStore } from '@/stores';
 
 const message = useMessage();
-
-const settingStore = useSettingStore();
-const { setting } = storeToRefs(settingStore);
 
 const workspace = useSakuraWorkspaceStore();
 const workspaceRef = workspace.ref;
@@ -25,15 +21,11 @@ type ProcessedJob = TranslateJob & {
 
 const processedJobs = ref<Map<string, ProcessedJob>>(new Map());
 const queuedJobVersion = ref(0);
-const shouldNotifyAllTasksCompleted = ref(false);
 
 watch(
   () => workspaceRef.value.jobs.map((it) => it.task).join('\n'),
   () => {
     queuedJobVersion.value += 1;
-    if (workspaceRef.value.jobs.length > 0) {
-      shouldNotifyAllTasksCompleted.value = true;
-    }
   },
 );
 
@@ -42,14 +34,6 @@ const getNextJob = () => {
   if (job !== undefined) {
     processedJobs.value.set(job.task, job);
     queuedJobVersion.value += 1;
-  } else if (
-    processedJobs.value.size === 0 &&
-    setting.value.workspaceSound &&
-    shouldNotifyAllTasksCompleted.value
-  ) {
-    // 全部任务都已经完成
-    shouldNotifyAllTasksCompleted.value = false;
-    new Audio(SoundAllTaskCompleted).play();
   }
   return job;
 };
