@@ -22,6 +22,7 @@ import kotlinx.datetime.Instant
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 import java.util.*
+import org.slf4j.LoggerFactory
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -48,6 +49,8 @@ class WebNovelMetadataRepository(
         mongo.database.getCollection<WebNovelReadHistoryDbModel>(
             MongoCollectionNames.WEB_READ_HISTORY,
         )
+
+    private val logger = LoggerFactory.getLogger(WebNovelMetadataRepository::class.java)
 
     private fun byId(providerId: String, novelId: String): Bson =
         and(
@@ -92,10 +95,14 @@ class WebNovelMetadataRepository(
             page = page,
             pageSize = pageSize
         )
-        val items = itemsEs.map { (providerId, novelId) ->
-            webNovelMetadataCollection
+        val items = itemsEs.mapNotNull { (providerId, novelId) ->
+            val item = webNovelMetadataCollection
                 .find(byId(providerId, novelId))
-                .firstOrNull()!!
+                .firstOrNull()
+            if (item == null) {
+                logger.warn("Web novel metadata missing for {}/{} while ES hit exists", providerId, novelId)
+            }
+            item
         }
         val ids = items.map { it.id }
         val favoredList = userId?.let {
