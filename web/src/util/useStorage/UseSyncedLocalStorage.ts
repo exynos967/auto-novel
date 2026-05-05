@@ -1,17 +1,17 @@
 import { HTTPError } from 'ky';
 import { pausableWatch } from '@vueuse/core';
-import { nextTick } from 'vue';
+import { nextTick, ref, type Ref } from 'vue';
 
 import { UserSettingApi } from '@/api';
 
-import { useLocalStorage } from './index';
+const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
 export function useSyncedLocalStorage<T extends object>(
   key: string,
   defaults: T,
   migrate?: (value: T) => void,
 ) {
-  const data = useLocalStorage<T>(key, defaults);
+  const data = ref<T>(clone(defaults)) as Ref<T>;
   migrate?.(data.value);
 
   let hydrated = false;
@@ -48,7 +48,7 @@ export function useSyncedLocalStorage<T extends object>(
         pause();
         data.value = Array.isArray(parsed)
           ? parsed
-          : { ...defaults, ...parsed };
+          : { ...clone(defaults), ...parsed };
         migrate?.(data.value);
         void nextTick(resume);
       } else if (remoteValue === undefined) {

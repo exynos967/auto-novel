@@ -13,19 +13,7 @@ type ReaderPositions = Record<string, ReadPosition | undefined>;
 
 const key = 'readPosition';
 
-const storage = {
-  get: () => {
-    const text = window.localStorage.getItem(key) ?? '';
-    const value = safeJson<ReaderPositions>(text) ?? {};
-    return value;
-  },
-  set: (value: ReaderPositions) => {
-    const text = JSON.stringify(value);
-    window.localStorage.setItem(key, text);
-  },
-};
-
-let positionsCache = storage.get();
+let positionsCache: ReaderPositions = {};
 let hydrated = false;
 let dirtyBeforeHydrated = false;
 let hydratePromise: Promise<void> | undefined;
@@ -46,7 +34,6 @@ const hydrate = async () => {
     const remoteValue = await UserSettingApi.getSetting(key);
     if (remoteValue !== undefined && !dirtyBeforeHydrated) {
       positionsCache = safeJson<ReaderPositions>(remoteValue) ?? positionsCache;
-      storage.set(positionsCache);
     } else if (remoteValue === undefined) {
       await saveRemote();
     }
@@ -75,7 +62,6 @@ const addPosition = (gnid: GenericNovelId, position: ReadPosition) => {
   } else {
     positionsCache[GenericNovelId.toString(gnid)] = position;
   }
-  storage.set(positionsCache);
   if (hydrated) {
     void saveRemote();
   } else {
