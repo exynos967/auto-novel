@@ -22,6 +22,7 @@ services:
       - redis
     environment:
       - HTTPS_PROXY
+      - HAMELN_TOKEN
       - PIXIV_COOKIE_PHPSESSID
       - DB_HOST_MONGO=mongo
       - DB_HOST_ES=elasticsearch
