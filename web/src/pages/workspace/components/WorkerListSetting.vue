@@ -124,6 +124,14 @@ const deleteWorker = (id: string) => {
         <n-thing>
           <template #header>
             {{ worker.id }}
+            <n-tag
+              v-if="worker.autoStart !== false"
+              :bordered="false"
+              size="small"
+              type="success"
+            >
+              自动翻译
+            </n-tag>
           </template>
           <template #description>
             {{ workerDescription(worker) }}

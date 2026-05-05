@@ -14,6 +14,8 @@ export interface Setting {
   favoriteCreateTimeFirst: boolean;
   //
   autoTopJobWhenAddTask: boolean;
+  autoTranslate: boolean;
+  autoTranslateProvider: 'gpt' | 'sakura';
   //
   menuCollapsed: boolean;
   //
@@ -46,6 +48,8 @@ export namespace Setting {
     favoriteCreateTimeFirst: false,
     //
     autoTopJobWhenAddTask: false,
+    autoTranslate: false,
+    autoTranslateProvider: 'sakura',
     //
     menuCollapsed: false,
     //
@@ -75,6 +79,12 @@ export namespace Setting {
     }
     if (setting.enabledTranslator === undefined) {
       setting.enabledTranslator = ['baidu', 'youdao', 'gpt', 'sakura'];
+    }
+    if (setting.autoTranslate === undefined) {
+      setting.autoTranslate = false;
+    }
+    if (setting.autoTranslateProvider === undefined) {
+      setting.autoTranslateProvider = 'sakura';
     }
     if ((setting.downloadFormat.mode as string) === 'mix') {
       setting.downloadFormat.mode = 'zh-jp';
@@ -111,6 +121,10 @@ export namespace Setting {
   export const paginationModeOptions = [
     { label: '分页', value: 'pagination' },
     { label: '滚动', value: 'scroll' },
+  ];
+  export const autoTranslateProviderOptions = [
+    { label: 'LLM', value: 'gpt' },
+    { label: 'Sakura', value: 'sakura' },
   ];
   export const localVolumeOrderOptions = [
     { value: 'byCreateAt', label: '添加时间' },

@@ -23,9 +23,13 @@ const initFormValue = () => {
       endpoint: '',
       segLength: 500,
       prevSegLength: 500,
+      autoStart: true,
     };
   } else {
-    return { ...worker };
+    return {
+      ...worker,
+      autoStart: worker.autoStart ?? true,
+    };
   }
 };
 
@@ -138,6 +142,12 @@ const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
           :show-button="false"
           :min="0"
         />
+      </n-form-item-row>
+
+      <n-form-item-row path="autoStart" label="自动翻译">
+        <n-checkbox v-model:checked="formValue.autoStart">
+          作为自动翻译器使用
+        </n-checkbox>
       </n-form-item-row>
 
       <n-text type="error" style="font-size: 12px">

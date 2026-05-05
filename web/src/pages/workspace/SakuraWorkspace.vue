@@ -4,14 +4,16 @@ import { VueDraggable } from 'vue-draggable-plus';
 
 import { SakuraTranslator } from '@/domain/translate';
 import { TranslationCacheRepo } from '@/repos';
-import type { TranslateJob } from '@/model/Translator';
+import type { SakuraWorker, TranslateJob } from '@/model/Translator';
 import { doAction } from '@/pages/util';
-import { useSakuraWorkspaceStore } from '@/stores';
+import { useSakuraWorkspaceStore, useSettingStore } from '@/stores';
 
 const message = useMessage();
 
 const workspace = useSakuraWorkspaceStore();
 const workspaceRef = workspace.ref;
+const settingStore = useSettingStore();
+const { setting } = storeToRefs(settingStore);
 
 const showLocalVolumeDrawer = ref(false);
 
@@ -21,6 +23,11 @@ type ProcessedJob = TranslateJob & {
 
 const processedJobs = ref<Map<string, ProcessedJob>>(new Map());
 const queuedJobVersion = ref(0);
+
+const shouldAutoStart = (worker: SakuraWorker) =>
+  setting.value.autoTranslate &&
+  setting.value.autoTranslateProvider === 'sakura' &&
+  worker.autoStart !== false;
 
 watch(
   () => workspaceRef.value.jobs.map((it) => it.task).join('\n'),
@@ -156,6 +163,7 @@ const clearCache = async () =>
             :worker="{ translatorId: 'sakura', ...worker }"
             :get-next-job="getNextJob"
             :job-version="queuedJobVersion"
+            :auto-start="shouldAutoStart(worker)"
             @update:progress="onProgressUpdated"
           />
         </n-list-item>

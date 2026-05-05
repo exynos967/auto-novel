@@ -20,6 +20,7 @@ const initFormValue = (): {
   model: string;
   endpoint: string;
   key: string;
+  autoStart: boolean;
 } => {
   const worker = props.worker;
   if (worker === undefined) {
@@ -28,6 +29,7 @@ const initFormValue = (): {
       model: 'deepseek-chat',
       endpoint: 'https://api.deepseek.com',
       key: '',
+      autoStart: true,
     };
   } else {
     return {
@@ -35,6 +37,7 @@ const initFormValue = (): {
       model: worker.model,
       endpoint: worker.endpoint,
       key: worker.key,
+      autoStart: worker.autoStart ?? true,
     };
   }
 };
@@ -99,13 +102,14 @@ const submit = async () => {
   });
   if (!validated) return;
 
-  const { id, model, endpoint, key } = formValue.value;
+  const { id, model, endpoint, key, autoStart } = formValue.value;
   const worker = {
     id: id.trim(),
     type: 'api' as const,
     model: model.trim(),
     endpoint: endpoint.trim(),
     key: key.trim(),
+    autoStart,
   };
 
   if (props.worker === undefined) {
@@ -165,6 +169,12 @@ const verb = computed(() => (props.worker === undefined ? '添加' : '更新'));
           placeholder="请输入Api key"
           :input-props="{ spellcheck: false }"
         />
+      </n-form-item-row>
+
+      <n-form-item-row path="autoStart" label="自动翻译">
+        <n-checkbox v-model:checked="formValue.autoStart">
+          作为自动翻译器使用
+        </n-checkbox>
       </n-form-item-row>
 
       <n-text depth="3" style="font-size: 12px">

@@ -98,6 +98,17 @@ const clearWenkuSearchHistory = () => {
           <n-checkbox v-model:checked="setting.autoTopJobWhenAddTask">
             工作区添加时自动置顶
           </n-checkbox>
+          <n-checkbox v-model:checked="setting.autoTranslate">
+            进入工作区自动开始翻译
+          </n-checkbox>
+          <n-flex v-if="setting.autoTranslate" align="center">
+            自动翻译提供商
+            <c-radio-group
+              v-model:value="setting.autoTranslateProvider"
+              :options="Setting.autoTranslateProviderOptions"
+              size="small"
+            />
+          </n-flex>
         </n-flex>
       </n-list-item>
 

@@ -3,14 +3,16 @@ import { BookOutlined, DeleteOutlineOutlined } from '@vicons/material';
 import { VueDraggable } from 'vue-draggable-plus';
 
 import { TranslationCacheRepo } from '@/repos';
-import type { TranslateJob } from '@/model/Translator';
+import type { GptWorker, TranslateJob } from '@/model/Translator';
 import { doAction } from '@/pages/util';
-import { useGptWorkspaceStore } from '@/stores';
+import { useGptWorkspaceStore, useSettingStore } from '@/stores';
 
 const message = useMessage();
 
 const workspace = useGptWorkspaceStore();
 const workspaceRef = workspace.ref;
+const settingStore = useSettingStore();
+const { setting } = storeToRefs(settingStore);
 
 const showLocalVolumeDrawer = ref(false);
 
@@ -20,6 +22,11 @@ type ProcessedJob = TranslateJob & {
 
 const processedJobs = ref<Map<string, ProcessedJob>>(new Map());
 const queuedJobVersion = ref(0);
+
+const shouldAutoStart = (worker: GptWorker) =>
+  setting.value.autoTranslate &&
+  setting.value.autoTranslateProvider === 'gpt' &&
+  worker.autoStart !== false;
 
 watch(
   () => workspaceRef.value.jobs.map((it) => it.task).join('\n'),
@@ -108,6 +115,7 @@ const clearCache = async () =>
             :worker="{ translatorId: 'gpt', ...worker }"
             :get-next-job="getNextJob"
             :job-version="queuedJobVersion"
+            :auto-start="shouldAutoStart(worker)"
             @update:progress="onProgressUpdated"
           />
         </n-list-item>

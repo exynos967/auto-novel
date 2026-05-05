@@ -16,6 +16,7 @@ const props = defineProps<{
     | ({ translatorId: 'sakura' } & SakuraWorker)
     | ({ translatorId: 'gpt' } & GptWorker);
   jobVersion: number;
+  autoStart: boolean;
   getNextJob: () =>
     | { task: string; description: string; createAt: number }
     | undefined;
@@ -66,7 +67,7 @@ const endpointPrefix = computed(() => {
   }
 });
 
-const enableAutoMode = ref(true);
+const enableAutoMode = ref(props.autoStart);
 
 const translateTask = useTemplateRef('translateTask');
 const currentJob = ref<{
@@ -136,6 +137,16 @@ watch(
   () => props.jobVersion,
   () => {
     if (enableAutoMode.value && !running.value) {
+      startWorker();
+    }
+  },
+);
+
+watch(
+  () => props.autoStart,
+  (autoStart) => {
+    enableAutoMode.value = autoStart;
+    if (autoStart && !running.value) {
       startWorker();
     }
   },
