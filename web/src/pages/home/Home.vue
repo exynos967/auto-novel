@@ -91,11 +91,6 @@ const linkExample = [
   ['Alphapolis', 'https://www.alphapolis.co.jp/novel/638978238/525733370'],
 ];
 
-const showQQModal = ref(false);
-const qqLink =
-  'http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=Qa0SOMBYZoJZ4vuykz3MbPS0zbpeN0pW&authKey=q75E7fr5CIBSDhqX%2F4kuC%2B0mcPiDvj%2FSDfP%2FGZ8Rl8kDn6Z3M6XPSZ91yt4ZWonq&noverify=0&group_code=819513328';
-
-const telegramLink = 'https://t.me/+Mphy0wV4LYZkNTI1';
 const githubLink = 'https://github.com/auto-novel/auto-novel';
 </script>
 
@@ -181,18 +176,8 @@ const githubLink = 'https://github.com/auto-novel/auto-novel';
           使用说明
         </n-button>
         /
-        <n-button text type="primary" @click="showQQModal = true">
-          QQ群
-        </n-button>
-        /
-        <n-a :href="telegramLink" target="_blank">Telegram</n-a>
-        /
         <n-a :href="githubLink" target="_blank">Github</n-a>
       </n-flex>
-      <n-p>
-        禁止使用脚本绕过翻译器提交翻译文本，哪怕你觉得自己提交的是正经翻译。
-      </n-p>
-      <n-p>有问题或建议请加群反馈。</n-p>
     </bulletin>
 
     <template v-if="whoami.isSignedIn">
@@ -241,16 +226,6 @@ const githubLink = 'https://github.com/auto-novel/auto-novel';
       <br />
       <!-- eslint-disable-next-line vue/no-v-html -->
       <span v-html="link" />
-    </n-p>
-  </c-modal>
-
-  <c-modal title="QQ群" v-model:show="showQQModal">
-    <n-p>
-      交流群：
-      <n-a :href="qqLink" target="_blank">819513328</n-a>
-      ，验证答案是“绿色”。
-      <br />
-      <n-qr-code :size="150" :value="qqLink" />
     </n-p>
   </c-modal>
 </template>

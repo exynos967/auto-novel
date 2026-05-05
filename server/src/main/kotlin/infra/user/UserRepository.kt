@@ -56,4 +56,23 @@ class UserRepository(
                 eq(UserDbModel::id.field(), ObjectId(userId)),
                 set(UserDbModel::readHistoryPaused.field(), readHistoryPause),
             )
+
+    suspend fun getSettings(userId: String): Map<String, String> =
+        userCollection
+            .find(eq(UserDbModel::id.field(), ObjectId(userId)))
+            .firstOrNull()
+            ?.settings
+            ?: emptyMap()
+
+    suspend fun updateSetting(
+        userId: String,
+        key: String,
+        value: String,
+    ) {
+        userCollection
+            .updateOne(
+                eq(UserDbModel::id.field(), ObjectId(userId)),
+                set("${UserDbModel::settings.field()}.$key", value),
+            )
+    }
 }

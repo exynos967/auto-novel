@@ -29,15 +29,31 @@ type ProcessedJob = TranslateJob & {
 };
 
 const processedJobs = ref<Map<string, ProcessedJob>>(new Map());
+const queuedJobVersion = ref(0);
+const shouldNotifyAllTasksCompleted = ref(false);
+
+watch(
+  () => workspaceRef.value.jobs.map((it) => it.task).join('\n'),
+  () => {
+    queuedJobVersion.value += 1;
+    if (workspaceRef.value.jobs.length > 0) {
+      shouldNotifyAllTasksCompleted.value = true;
+    }
+  },
+);
 
 const getNextJob = () => {
-  const job = workspaceRef.value.jobs.find(
-    (it) => !processedJobs.value.has(it.task),
-  );
+  const job = workspace.takeNextJob(new Set(processedJobs.value.keys()));
   if (job !== undefined) {
     processedJobs.value.set(job.task, job);
-  } else if (processedJobs.value.size === 0 && setting.value.workspaceSound) {
+    queuedJobVersion.value += 1;
+  } else if (
+    processedJobs.value.size === 0 &&
+    setting.value.workspaceSound &&
+    shouldNotifyAllTasksCompleted.value
+  ) {
     // 全部任务都已经完成
+    shouldNotifyAllTasksCompleted.value = false;
     new Audio(SoundAllTaskCompleted).play();
   }
   return job;
@@ -165,6 +181,7 @@ const clearCache = async () =>
           <job-worker
             :worker="{ translatorId: 'sakura', ...worker }"
             :get-next-job="getNextJob"
+            :job-version="queuedJobVersion"
             @update:progress="onProgressUpdated"
           />
         </n-list-item>

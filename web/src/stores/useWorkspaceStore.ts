@@ -4,7 +4,8 @@ import type {
   TranslateJobRecord,
 } from '@/model/Translator';
 import { TranslateJob } from '@/model/Translator';
-import { lazy, useLocalStorage } from '@/util';
+import { lazy } from '@/util';
+import { useSyncedLocalStorage } from '@/util/useStorage/UseSyncedLocalStorage';
 
 import { LSKey } from './key';
 
@@ -18,17 +19,21 @@ interface Workspace<T> {
 const createWorkspaceStore = <W extends GptWorker | SakuraWorker>(
   id: string,
   workers: W[],
-  migrate?: (ref: Ref<Workspace<W>>) => void,
+  migrate?: (workspace: Workspace<W>) => void,
 ) => {
-  const ref = useLocalStorage<Workspace<W>>(id, {
-    workers,
-    jobs: [],
-    uncompletedJobs: [],
-  });
-
-  if (migrate) {
-    migrate(ref);
-  }
+  const ref = useSyncedLocalStorage<Workspace<W>>(
+    id,
+    {
+      workers,
+      jobs: [],
+      uncompletedJobs: [],
+    },
+    (value) => {
+      if (migrate) {
+        migrate(value);
+      }
+    },
+  );
 
   const addWorker = (worker: W) => {
     ref.value.workers.push(worker);
@@ -58,6 +63,14 @@ const createWorkspaceStore = <W extends GptWorker | SakuraWorker>(
     ref.value.jobs.sort((a, b) => {
       return a.task == job.task ? 1 : b.task == job.task ? -1 : 0;
     });
+  };
+
+  const takeNextJob = (processedTasks: Set<string>) => {
+    const job = ref.value.jobs.find((it) => !processedTasks.has(it.task));
+    if (job !== undefined) {
+      processedTasks.add(job.task);
+    }
+    return job;
   };
 
   const addJobRecord = (job: TranslateJobRecord) => {
@@ -104,6 +117,7 @@ const createWorkspaceStore = <W extends GptWorker | SakuraWorker>(
     //
     addJob,
     deleteJob,
+    takeNextJob,
     topJob,
     bottomJob,
     //
@@ -118,7 +132,7 @@ const createWorkspaceStore = <W extends GptWorker | SakuraWorker>(
 const createGptWorkspaceStore = () =>
   createWorkspaceStore<GptWorker>(LSKey.WorkspaceGpt, [], (workspace) => {
     // 2024-3-8
-    workspace.value.workers.forEach((it: GptWorker) => {
+    workspace.workers.forEach((it: GptWorker) => {
       if (it.endpoint.length === 0) {
         if (it.type === 'web') {
           it.endpoint = 'https://chat.openai.com/backend-api';
@@ -146,7 +160,7 @@ const createSakuraWorkspaceStore = () =>
     ],
     (workspace) => {
       // 2024-5-14
-      workspace.value.workers.forEach((it: SakuraWorker) => {
+      workspace.workers.forEach((it: SakuraWorker) => {
         if ('testContext' in it) {
           it.testContext = undefined;
         }
@@ -158,11 +172,11 @@ const createSakuraWorkspaceStore = () =>
 
       // 2025-2-21
       if (
-        workspace.value.workers.find(
+        workspace.workers.find(
           (it) => it.endpoint === 'https://sakura-share.one',
         ) === undefined
       ) {
-        workspace.value.workers.unshift({
+        workspace.workers.unshift({
           id: '共享',
           endpoint: 'https://sakura-share.one',
         });

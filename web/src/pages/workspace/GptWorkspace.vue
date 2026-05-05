@@ -24,13 +24,20 @@ type ProcessedJob = TranslateJob & {
 };
 
 const processedJobs = ref<Map<string, ProcessedJob>>(new Map());
+const queuedJobVersion = ref(0);
+
+watch(
+  () => workspaceRef.value.jobs.map((it) => it.task).join('\n'),
+  () => {
+    queuedJobVersion.value += 1;
+  },
+);
 
 const getNextJob = () => {
-  const job = workspace.ref.value.jobs.find(
-    (it) => !processedJobs.value.has(it.task),
-  );
+  const job = workspace.takeNextJob(new Set(processedJobs.value.keys()));
   if (job !== undefined) {
     processedJobs.value.set(job.task, job);
+    queuedJobVersion.value += 1;
   }
   return job;
 };
@@ -82,22 +89,6 @@ const clearCache = async () =>
   <div class="layout-content">
     <n-h1>LLM工作区</n-h1>
 
-    <bulletin>
-      <n-flex>
-        <n-a href="https://chat.deepseek.com" target="_blank">
-          DeepSeek Chat
-        </n-a>
-        /
-        <n-a href="https://platform.deepseek.com/usage" target="_blank">
-          DeepSeek API
-        </n-a>
-      </n-flex>
-      <n-p>
-        不再支持 LLM Web，推荐使用兼容 OpenAI 的 LLM API，例如 DeepSeek API。
-      </n-p>
-      <n-p>本地小说支持韩语等其他语种，网络小说/文库小说暂时只允许日语。</n-p>
-    </bulletin>
-
     <section-header title="翻译器">
       <c-button
         label="添加翻译器"
@@ -126,6 +117,7 @@ const clearCache = async () =>
           <job-worker
             :worker="{ translatorId: 'gpt', ...worker }"
             :get-next-job="getNextJob"
+            :job-version="queuedJobVersion"
             @update:progress="onProgressUpdated"
           />
         </n-list-item>

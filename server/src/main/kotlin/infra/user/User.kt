@@ -30,4 +30,5 @@ data class UserDbModel(
     val favoredWeb: List<UserFavored>,
     val favoredWenku: List<UserFavored>,
     val readHistoryPaused: Boolean = false,
+    val settings: Map<String, String> = emptyMap(),
 )

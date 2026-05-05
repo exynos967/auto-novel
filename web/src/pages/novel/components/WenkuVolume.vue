@@ -68,12 +68,12 @@ const submitJob = (id: 'gpt' | 'sakura') => {
   };
   const success = workspace.addJob(job);
   if (success) {
-    message.success('排队成功');
+    message.success('已加入任务');
     if (shouldTopJob.value) {
       workspace.topJob(job);
     }
   } else {
-    message.error('排队失败：翻译任务已经存在');
+    message.error('添加失败：翻译任务已经存在');
   }
 };
 </script>
@@ -106,14 +106,14 @@ const submitJob = (id: 'gpt' | 'sakura') => {
 
         <c-button
           v-if="setting.enabledTranslator.includes('gpt')"
-          label="排队LLM"
+          label="开始LLM翻译"
           size="tiny"
           secondary
           @action="submitJob('gpt')"
         />
         <c-button
           v-if="setting.enabledTranslator.includes('sakura')"
-          label="排队Sakura"
+          label="开始Sakura翻译"
           size="tiny"
           secondary
           @action="submitJob('sakura')"

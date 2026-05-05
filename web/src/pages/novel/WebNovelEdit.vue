@@ -104,7 +104,7 @@ const submit = async () => {
         </n-input-group>
       </n-form-item>
 
-      <n-form-item label="日文标题">
+      <n-form-item label="原文标题">
         {{ formValue.titleJp }}
       </n-form-item>
       <n-form-item path="title" label="中文标题">
@@ -115,7 +115,7 @@ const submit = async () => {
         />
       </n-form-item>
 
-      <n-form-item label="日文简介">
+      <n-form-item label="原文简介">
         {{ formValue.introductionJp }}
       </n-form-item>
       <n-form-item path="introduction" label="中文简介">

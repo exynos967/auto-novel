@@ -1,4 +1,4 @@
-import { useLocalStorage } from '@/util';
+import { useSyncedLocalStorage } from '@/util/useStorage/UseSyncedLocalStorage';
 import { LSKey } from './key';
 
 interface SearchHistory {
@@ -8,7 +8,7 @@ interface SearchHistory {
 
 const useSearchHistoryStore = (key: string) => {
   return defineStore(key, () => {
-    const ref = useLocalStorage<SearchHistory>(key, {
+    const ref = useSyncedLocalStorage<SearchHistory>(key, {
       queries: [],
       tags: [],
     });

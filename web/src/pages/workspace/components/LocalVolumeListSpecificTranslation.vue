@@ -56,7 +56,7 @@ const queueAllVolumes = (volumes: LocalVolumeMetadata[]) => {
     type: props.type,
     shouldTop: shouldTopJob.value ?? false,
   });
-  message.info(`${success}本小说已排队，${failed}本失败`);
+  message.info(`${success}本小说已加入任务，${failed}本失败`);
 };
 
 const shouldTopJob = useKeyModifier('Control');
@@ -74,9 +74,9 @@ const queueVolume = (volumeId: string, total: number = 65536) => {
     total: total,
   });
   if (success) {
-    message.success('排队成功');
+    message.success('已加入任务');
   } else {
-    message.error('排队失败：翻译任务已经存在');
+    message.error('添加失败：翻译任务已经存在');
   }
 };
 
@@ -121,7 +121,7 @@ const progressFilterFunc = computed(() => {
 <template>
   <local-volume-list
     :filter="progressFilterFunc"
-    :options="{ 全部排队: queueAllVolumes }"
+    :options="{ 全部开始: queueAllVolumes }"
     @volume-add="queueVolume($event.name)"
   >
     <template #extra>
@@ -161,7 +161,7 @@ const progressFilterFunc = computed(() => {
 
         <n-flex :size="8">
           <c-button
-            label="排队"
+            label="开始翻译"
             size="tiny"
             secondary
             @action="queueVolume(volume.id, volume.toc.length)"

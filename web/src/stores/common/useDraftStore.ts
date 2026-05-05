@@ -1,6 +1,6 @@
 import { throttle } from 'lodash-es';
 
-import { useLocalStorage } from '@/util';
+import { useSyncedLocalStorage } from '@/util/useStorage/UseSyncedLocalStorage';
 import { LSKey } from '../key';
 
 export interface Draft {
@@ -13,7 +13,7 @@ interface DraftRegistry {
 }
 
 export const useDraftStore = defineStore(LSKey.Draft, () => {
-  const registry = useLocalStorage<DraftRegistry>(LSKey.Draft, {});
+  const registry = useSyncedLocalStorage<DraftRegistry>(LSKey.Draft, {});
 
   function getDraft(draftId: string) {
     if (!(draftId in registry.value)) return [];

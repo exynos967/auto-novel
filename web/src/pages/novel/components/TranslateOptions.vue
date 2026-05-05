@@ -144,7 +144,8 @@ const showDownloadModal = ref(false);
               <n-icon depth="4" :component="InfoOutlined" />
             </n-button>
           </template>
-          章节序号看下面目录方括号里的数字。“从0到10”表示从第0章到第9章，不包含第10章。均分任务只对排队生效，最大为10。
+          章节序号看下面目录方括号里的数字。“从0到10”表示从第0章到第9章，不包含第10章。均分任务只对
+          LLM/Sakura 翻译生效，最大为10。
         </n-tooltip>
       </n-flex>
     </c-action-wrapper>

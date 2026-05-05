@@ -156,6 +156,7 @@ const navToChapter = async (chapterId: string) => {
 };
 
 const scrollToReadPosition = async () => {
+  await ReadPositionRepo.ready();
   const readPosition = ReadPositionRepo.getPosition(gnid);
   if (readPosition && readPosition.chapterId === route.params.chapterId) {
     // hacky: 等待段落显示完成

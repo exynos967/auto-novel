@@ -114,7 +114,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
   const taskNumber = translateOptions.value!.getTaskNumber();
 
   if (endIndex <= startIndex || startIndex >= total) {
-    message.error('排队失败：没有选中章节');
+    message.error('添加失败：没有选中章节');
     return;
   }
 
@@ -161,9 +161,9 @@ const submitJob = (id: 'gpt' | 'sakura') => {
     return success;
   });
   if (results.length === 1 && !results[0]) {
-    message.error('排队失败：翻译任务已经存在');
+    message.error('添加失败：翻译任务已经存在');
   } else {
-    message.success('排队成功');
+    message.success('已加入任务');
   }
 };
 </script>
@@ -202,13 +202,13 @@ const submitJob = (id: 'gpt' | 'sakura') => {
         />
         <c-button
           v-if="setting.enabledTranslator.includes('gpt')"
-          label="排队LLM"
+          label="开始LLM翻译"
           :round="false"
           @action="submitJob('gpt')"
         />
         <c-button
           v-if="setting.enabledTranslator.includes('sakura')"
-          label="排队Sakura"
+          label="开始Sakura翻译"
           :round="false"
           @action="submitJob('sakura')"
         />
@@ -233,7 +233,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
         target="_blank"
       />
       <c-button
-        label="导入日文至工作区"
+        label="导入原文到本地书架"
         :round="false"
         @action="importToWorkspace"
       />

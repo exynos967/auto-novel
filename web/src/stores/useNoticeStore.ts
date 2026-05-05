@@ -1,4 +1,4 @@
-import { useLocalStorage } from '@vueuse/core';
+import { useSyncedLocalStorage } from '@/util/useStorage/UseSyncedLocalStorage';
 import { LSKey } from './key';
 
 interface Noticed {
@@ -6,7 +6,7 @@ interface Noticed {
 }
 
 export const useNoticeStore = defineStore(LSKey.Notified, () => {
-  const noticed = useLocalStorage<Noticed>(LSKey.Notified, {
+  const noticed = useSyncedLocalStorage<Noticed>(LSKey.Notified, {
     wenkuUploadRule: 0,
   });
   return {

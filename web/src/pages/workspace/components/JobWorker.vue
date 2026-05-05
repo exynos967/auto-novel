@@ -20,6 +20,7 @@ const props = defineProps<{
   worker:
     | ({ translatorId: 'sakura' } & SakuraWorker)
     | ({ translatorId: 'gpt' } & GptWorker);
+  jobVersion: number;
   getNextJob: () =>
     | { task: string; description: string; createAt: number }
     | undefined;
@@ -83,7 +84,6 @@ const running = computed(() => currentJob.value !== undefined);
 let abortHandler = () => {};
 
 const processTasks = async () => {
-  message.info('获取翻译任务');
   const controller = new AbortController();
   const { signal } = controller;
   abortHandler = () => controller.abort();
@@ -93,6 +93,7 @@ const processTasks = async () => {
     currentJob.value = job;
 
     if (job === undefined) break;
+    message.info('获取翻译任务');
     const { desc, params } = TranslateTaskDescriptor.parse(job.task);
 
     const state = await translateTask.value!.startTask(
@@ -167,6 +168,21 @@ const testWorker = async () => {
 };
 
 const showEditWorkerModal = ref(false);
+
+onMounted(() => {
+  if (enableAutoMode.value) {
+    startWorker();
+  }
+});
+
+watch(
+  () => props.jobVersion,
+  () => {
+    if (enableAutoMode.value && !running.value) {
+      startWorker();
+    }
+  },
+);
 </script>
 
 <template>
@@ -206,7 +222,7 @@ const showEditWorkerModal = ref(false);
         />
         <c-button
           v-else
-          label="启动"
+          label="开始"
           :icon="PlayArrowOutlined"
           size="tiny"
           secondary
@@ -227,13 +243,13 @@ const showEditWorkerModal = ref(false);
 
         <c-icon-button
           v-if="enableAutoMode"
-          tooltip="自动翻译下个任务：已启动"
+          tooltip="自动继续翻译：已开启"
           :icon="FontDownloadOutlined"
           @action="enableAutoMode = false"
         />
         <c-icon-button
           v-else
-          tooltip="自动翻译下个任务：已关闭"
+          tooltip="自动继续翻译：已关闭"
           :icon="FontDownloadOffOutlined"
           @action="enableAutoMode = true"
         />

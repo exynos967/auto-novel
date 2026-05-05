@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import type { Favored } from '@/api';
 import { FavoredApi } from '@/api';
-import { useLocalStorage } from '@/util';
+import { useSyncedLocalStorage } from '@/util/useStorage/UseSyncedLocalStorage';
 import { LSKey } from './key';
 import { useWhoamiStore } from './useWhoamiStore';
 
@@ -14,7 +14,7 @@ interface FavoredList {
 }
 
 export const useFavoredStore = defineStore(LSKey.Favored, () => {
-  const favoreds = useLocalStorage<FavoredList>(LSKey.Favored, {
+  const favoreds = useSyncedLocalStorage<FavoredList>(LSKey.Favored, {
     web: [{ id: 'default', title: '默认收藏夹' }],
     wenku: [{ id: 'default', title: '默认收藏夹' }],
     local: [{ id: 'default', title: '默认收藏夹' }],

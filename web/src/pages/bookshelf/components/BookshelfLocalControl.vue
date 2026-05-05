@@ -126,7 +126,7 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
     type,
     shouldTop: shouldTopJob.value ?? false,
   });
-  message.info(`${success}本小说已排队，${failed}本失败`);
+  message.info(`${success}本小说已加入任务，${failed}本失败`);
 };
 </script>
 
@@ -259,13 +259,13 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
           <n-button-group size="small">
             <c-button
               v-if="setting.enabledTranslator.includes('gpt')"
-              label="排队LLM"
+              label="开始LLM翻译"
               :round="false"
               @action="queueJobs('gpt')"
             />
             <c-button
               v-if="setting.enabledTranslator.includes('sakura')"
-              label="排队Sakura"
+              label="开始Sakura翻译"
               :round="false"
               @action="queueJobs('sakura')"
             />

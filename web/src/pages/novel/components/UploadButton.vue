@@ -15,7 +15,6 @@ import type { UploadTask } from '@/api/novel/client';
 
 const props = defineProps<{
   novelId: string;
-  allowZh: boolean;
 }>();
 
 const message = useMessage();
@@ -58,14 +57,14 @@ async function beforeUpload({ file }: { file: UploadFileInfo }) {
     return false;
   }
 
-  const p = (charsCount.jp + charsCount.ko) / charsCount.total;
-  if (p < 0.33) {
-    if (!props.allowZh) {
-      message.error('疑似中文小说，文库不允许上传');
-      return false;
-    } else {
-      file.url = 'zh';
-    }
+  const sourceLanguageChars =
+    charsCount.jp + charsCount.ko + charsCount.en + charsCount.zh;
+  const p = sourceLanguageChars / charsCount.total;
+  if (
+    p < 0.33 ||
+    (charsCount.zh > 0 && charsCount.zh / sourceLanguageChars > 0.7)
+  ) {
+    file.url = 'zh';
   } else {
     file.url = 'jp';
   }
@@ -205,11 +204,11 @@ const uploadVolumes = () => {
     <n-p>在上传小说之前，请务必遵守以下规则。</n-p>
     <n-ul>
       <n-li>
-        日文章节上传前请确定里面有文本，单卷书压缩包超40MB里面大概率只有扫图无文本，这种是无法翻译的。
+        原文章节上传前请确定里面有文本，单卷书压缩包超40MB里面大概率只有扫图无文本，这种是无法翻译的。
       </n-li>
       <n-li>EPUB文件大小超过40MB无法上传，请压缩里面的图片。</n-li>
       <n-li>不要上传已存在的分卷，现存的分卷有问题请联系管理员。</n-li>
-      <n-li>分卷文件名应当只包含日文标题、卷数、分卷日文标题。</n-li>
+      <n-li>分卷文件名应当只包含原文标题、卷数、分卷原文标题。</n-li>
     </n-ul>
     <n-p>由于文库小说还在开发中，规则也会变化，务必留意。</n-p>
 

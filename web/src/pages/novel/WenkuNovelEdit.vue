@@ -72,7 +72,7 @@ const formRules: FormRules = {
     {
       validator: (_rule: FormItemRule, value: string) =>
         !RegexUtil.hasKanaChars(value),
-      message: '不要使用日文当作中文标题，没有公认的标题可以尝试自行翻译',
+      message: '不要使用原文当作中文标题，没有公认的标题可以尝试自行翻译',
       trigger: 'input',
     },
   ],
@@ -359,10 +359,10 @@ const levelOptions = [
           请先安装机翻站扩展以启用智能导入功能，另外自动机翻简介功能要求你能使用有道机翻。
         </n-li>
         <n-li>
-          文库小说只允许已经发行单行本的日语小说，原则上以亚马逊上可以买到为准，系列小说不要分开导入。
+          文库小说原则上以已经发行单行本或电子书的作品为准，系列小说不要分开导入。
         </n-li>
         <n-li>
-          在导入栏输入亚马逊系列/单本链接直接导入，或是输入小说日文主标题搜索导入。
+          在导入栏输入亚马逊系列/单本链接直接导入，或是输入小说原文主标题搜索导入。
         </n-li>
         <n-li>
           导入R18书需要注册机翻站满一个月、使用日本IP，并在亚马逊上点过“已满18岁”。
@@ -426,10 +426,10 @@ const levelOptions = [
       :label-placement="isWideScreen ? 'left' : 'top'"
       label-width="auto"
     >
-      <n-form-item-row path="title" label="日文标题">
+      <n-form-item-row path="title" label="原文标题">
         <n-input
           v-model:value="formValue.title"
-          placeholder="请输入日文标题"
+          placeholder="请输入原文标题"
           maxlength="80"
           show-count
           :input-props="{ spellcheck: false }"
@@ -636,7 +636,7 @@ const levelOptions = [
     >
       <n-step title="检查小说是否已经存在">
         <p>
-          创建文库页面前，请先确定你要创建的小说页面不存在，不要重复创建。你可以通过下面的搜索按钮搜索章节标题，注意自动搜索不总是能正确提取出关键词，如果关键词不正确，请手动搜索日文标题。
+          创建文库页面前，请先确定你要创建的小说页面不存在，不要重复创建。你可以通过下面的搜索按钮搜索章节标题，注意自动搜索不总是能正确提取出关键词，如果关键词不正确，请手动搜索原文标题。
         </p>
         <p>
           自动搜索关键词：

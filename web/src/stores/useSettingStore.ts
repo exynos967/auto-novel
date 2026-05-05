@@ -1,5 +1,6 @@
 import type { TranslatorId } from '@/model/Translator';
-import { defaultConverter, useLocalStorage, useOpenCC } from '@/util';
+import { defaultConverter, useOpenCC } from '@/util';
+import { useSyncedLocalStorage } from '@/util/useStorage/UseSyncedLocalStorage';
 import { LSKey } from './key';
 
 export interface Setting {
@@ -274,8 +275,11 @@ export namespace ReaderSetting {
 }
 
 export const useSettingStore = defineStore(LSKey.Setting, () => {
-  const setting = useLocalStorage<Setting>(LSKey.Setting, Setting.defaultValue);
-  Setting.migrate(setting.value);
+  const setting = useSyncedLocalStorage<Setting>(
+    LSKey.Setting,
+    Setting.defaultValue,
+    Setting.migrate,
+  );
 
   const cc = ref(defaultConverter);
 
@@ -291,10 +295,10 @@ export const useSettingStore = defineStore(LSKey.Setting, () => {
 });
 
 export const useReaderSettingStore = defineStore(LSKey.SettingReader, () => {
-  const readerSetting = useLocalStorage<ReaderSetting>(
+  const readerSetting = useSyncedLocalStorage<ReaderSetting>(
     LSKey.SettingReader,
     ReaderSetting.defaultValue,
+    ReaderSetting.migrate,
   );
-  ReaderSetting.migrate(readerSetting.value);
   return { readerSetting };
 });
