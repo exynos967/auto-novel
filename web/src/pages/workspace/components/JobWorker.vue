@@ -1,20 +1,15 @@
 <script lang="ts" setup>
 import {
-  DeleteOutlineOutlined,
   DragIndicatorOutlined,
-  FlashOnOutlined,
   FontDownloadOffOutlined,
   FontDownloadOutlined,
   PlayArrowOutlined,
-  SettingsOutlined,
   StopOutlined,
 } from '@vicons/material';
 
 import type { TranslatorConfig } from '@/domain/translate';
-import { Translator } from '@/domain/translate';
 import type { GptWorker, SakuraWorker } from '@/model/Translator';
 import { TranslateTaskDescriptor } from '@/model/Translator';
-import { useWorkspaceStore } from '@/stores';
 
 const props = defineProps<{
   worker:
@@ -130,44 +125,6 @@ const stopWorker = () => {
   if (!running.value) return;
   abortHandler();
 };
-const deleteWorker = () => {
-  const worker = props.worker;
-  abortHandler();
-  const workspace = useWorkspaceStore(worker.translatorId);
-  workspace.deleteWorker(worker.id);
-};
-
-const testWorker = async () => {
-  const worker = props.worker;
-  const textJp = [
-    '国境の長いトンネルを抜けると雪国であった。夜の底が白くなった。信号所に汽車が止まった。',
-  ];
-  try {
-    const translator = await Translator.create(translatorConfig.value);
-    const textZh = await translator.translate(textJp);
-
-    const lineJp = textJp[0];
-    const lineZh = textZh[0];
-
-    if (worker.translatorId === 'gpt') {
-      message.success(`原文：${lineJp}\n译文：${lineZh}`);
-    } else {
-      message.success(
-        [
-          `原文：${lineJp}`,
-          `译文：${lineZh}`,
-          `模型：${translator.sakuraModel()} ${
-            translator.allowUpload() ? '允许上传' : '禁止上传'
-          }`,
-        ].join('\n'),
-      );
-    }
-  } catch (e: unknown) {
-    message.error(`翻译器错误：${e}`);
-  }
-};
-
-const showEditWorkerModal = ref(false);
 
 onMounted(() => {
   if (enableAutoMode.value) {
@@ -230,18 +187,6 @@ watch(
         />
 
         <c-icon-button
-          tooltip="测试"
-          :icon="FlashOnOutlined"
-          @action="testWorker"
-        />
-
-        <c-icon-button
-          tooltip="设置"
-          :icon="SettingsOutlined"
-          @action="showEditWorkerModal = !showEditWorkerModal"
-        />
-
-        <c-icon-button
           v-if="enableAutoMode"
           tooltip="自动继续翻译：已开启"
           :icon="FontDownloadOutlined"
@@ -253,27 +198,9 @@ watch(
           :icon="FontDownloadOffOutlined"
           @action="enableAutoMode = true"
         />
-
-        <c-icon-button
-          tooltip="删除"
-          :icon="DeleteOutlineOutlined"
-          type="error"
-          @action="deleteWorker"
-        />
       </n-flex>
     </template>
   </n-thing>
 
   <TranslateTask ref="translateTask" style="margin-top: 20px" />
-
-  <sakura-worker-modal
-    v-if="worker.translatorId === 'sakura'"
-    v-model:show="showEditWorkerModal"
-    :worker="worker"
-  />
-  <gpt-worker-modal
-    v-else
-    v-model:show="showEditWorkerModal"
-    :worker="worker"
-  />
 </template>

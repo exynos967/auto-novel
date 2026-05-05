@@ -60,6 +60,14 @@ const playSound = (source: string) => {
 
       <n-list-item>
         <n-flex vertical>
+          <worker-list-setting type="gpt" />
+          <n-divider />
+          <worker-list-setting type="sakura" />
+        </n-flex>
+      </n-list-item>
+
+      <n-list-item>
+        <n-flex vertical>
           <b>网络小说目录</b>
           <n-checkbox v-model:checked="setting.tocCollapseInNarrowScreen">
             目录折叠在侧边栏 (移动端)

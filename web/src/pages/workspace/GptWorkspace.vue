@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-import {
-  BookOutlined,
-  DeleteOutlineOutlined,
-  PlusOutlined,
-} from '@vicons/material';
+import { BookOutlined, DeleteOutlineOutlined } from '@vicons/material';
 import { VueDraggable } from 'vue-draggable-plus';
 
 import { TranslationCacheRepo } from '@/repos';
@@ -16,7 +12,6 @@ const message = useMessage();
 const workspace = useGptWorkspaceStore();
 const workspaceRef = workspace.ref;
 
-const showCreateWorkerModal = ref(false);
 const showLocalVolumeDrawer = ref(false);
 
 type ProcessedJob = TranslateJob & {
@@ -90,11 +85,6 @@ const clearCache = async () =>
     <n-h1>LLM工作区</n-h1>
 
     <section-header title="翻译器">
-      <c-button
-        label="添加翻译器"
-        :icon="PlusOutlined"
-        @action="showCreateWorkerModal = true"
-      />
       <c-button-confirm
         hint="真的要清空缓存吗？"
         label="清空缓存"
@@ -163,6 +153,4 @@ const clearCache = async () =>
     v-model:show="showLocalVolumeDrawer"
     type="gpt"
   />
-
-  <gpt-worker-modal v-model:show="showCreateWorkerModal" />
 </template>

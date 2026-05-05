@@ -44,8 +44,11 @@ export function useSyncedLocalStorage<T extends object>(
     try {
       const remoteValue = await UserSettingApi.getSetting(key);
       if (remoteValue !== undefined && !dirtyBeforeHydrated) {
+        const parsed = JSON.parse(remoteValue);
         pause();
-        data.value = { ...defaults, ...JSON.parse(remoteValue) };
+        data.value = Array.isArray(parsed)
+          ? parsed
+          : { ...defaults, ...parsed };
         migrate?.(data.value);
         void nextTick(resume);
       } else if (remoteValue === undefined) {

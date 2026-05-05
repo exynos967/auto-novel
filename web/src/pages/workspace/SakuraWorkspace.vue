@@ -1,9 +1,5 @@
 <script lang="ts" setup>
-import {
-  BookOutlined,
-  DeleteOutlineOutlined,
-  PlusOutlined,
-} from '@vicons/material';
+import { BookOutlined, DeleteOutlineOutlined } from '@vicons/material';
 import { VueDraggable } from 'vue-draggable-plus';
 
 import { SakuraTranslator } from '@/domain/translate';
@@ -21,7 +17,6 @@ const { setting } = storeToRefs(settingStore);
 const workspace = useSakuraWorkspaceStore();
 const workspaceRef = workspace.ref;
 
-const showCreateWorkerModal = ref(false);
 const showLocalVolumeDrawer = ref(false);
 
 type ProcessedJob = TranslateJob & {
@@ -154,11 +149,6 @@ const clearCache = async () =>
     </bulletin>
 
     <section-header title="翻译器">
-      <c-button
-        label="添加翻译器"
-        :icon="PlusOutlined"
-        @action="showCreateWorkerModal = true"
-      />
       <c-button-confirm
         hint="真的要清空缓存吗？"
         label="清空缓存"
@@ -227,6 +217,4 @@ const clearCache = async () =>
     v-model:show="showLocalVolumeDrawer"
     type="sakura"
   />
-
-  <sakura-worker-modal v-model:show="showCreateWorkerModal" />
 </template>

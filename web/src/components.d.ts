@@ -174,5 +174,6 @@ declare module 'vue' {
     WebNovelWide: typeof import('./pages/novel/components/WebNovelWide.vue')['default']
     WebTranslate: typeof import('./pages/novel/components/WebTranslate.vue')['default']
     WenkuVolume: typeof import('./pages/novel/components/WenkuVolume.vue')['default']
+    WorkerListSetting: typeof import('./pages/workspace/components/WorkerListSetting.vue')['default']
   }
 }

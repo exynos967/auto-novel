@@ -153,11 +153,7 @@ const createGptWorkspaceStore = () =>
 const createSakuraWorkspaceStore = () =>
   createWorkspaceStore<SakuraWorker>(
     LSKey.WorkspaceSakura,
-    [
-      { id: '共享', endpoint: 'https://sakura-share.one' },
-      { id: '本机', endpoint: 'http://127.0.0.1:8080' },
-      { id: 'AutoDL', endpoint: 'http://127.0.0.1:6006' },
-    ],
+    [{ id: '共享', endpoint: 'https://sakura-share.one' }],
     (workspace) => {
       // 2024-5-14
       workspace.workers.forEach((it: SakuraWorker) => {
@@ -169,6 +165,15 @@ const createSakuraWorkspaceStore = () =>
           it.testSegLength = undefined;
         }
       });
+
+      // 2026-5-5
+      workspace.workers = workspace.workers.filter(
+        (it) =>
+          !(
+            (it.id === '本机' && it.endpoint === 'http://127.0.0.1:8080') ||
+            (it.id === 'AutoDL' && it.endpoint === 'http://127.0.0.1:6006')
+          ),
+      );
 
       // 2025-2-21
       if (
