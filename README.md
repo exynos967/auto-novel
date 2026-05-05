@@ -24,7 +24,9 @@ cd auto-novel
 cp .env.example .env
 
 # 3. 启动服务
-mkdir -p -m 777 ./data/es/data ./data/es/plugins
+sudo mkdir -p ./data/es/data ./data/es/plugins
+sudo chown -R 1000:0 ./data/es/data ./data/es/plugins
+sudo chmod -R g+rwX ./data/es/data ./data/es/plugins
 docker compose up -d
 ```
 
