@@ -4,18 +4,18 @@ import { VueDraggable } from 'vue-draggable-plus';
 
 import { TranslationCacheRepo } from '@/repos';
 import WorkspaceShell from './translation/WorkspaceShell.vue';
-import type { GptWorker, TranslateJob } from '@/model/Translator';
+import type { GptWorker, SakuraWorker, TranslateJob } from '@/model/Translator';
 import { doAction } from '@/pages/util';
-import { useGptWorkspaceStore, useSettingStore } from '@/stores';
+import {
+  useGptWorkspaceStore,
+  useSakuraWorkspaceStore,
+  useSettingStore,
+} from '@/stores';
 
 const message = useMessage();
 
-const workspace = useGptWorkspaceStore();
-const workspaceRef = workspace.ref;
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
-
-const showLocalVolumeDrawer = ref(false);
 
 type ProcessedJob = TranslateJob & {
   progress?: { finished: number; error: number; total: number };
@@ -24,9 +24,29 @@ type ProcessedJob = TranslateJob & {
 const processedJobs = ref<Map<string, ProcessedJob>>(new Map());
 const queuedJobVersion = ref(0);
 
-const shouldAutoStart = (worker: GptWorker) =>
+const gptWorkspace = useGptWorkspaceStore();
+const sakuraWorkspace = useSakuraWorkspaceStore();
+const activeProvider = computed<'gpt' | 'sakura'>({
+  get: () => setting.value.autoTranslateProvider,
+  set: (value) => {
+    setting.value.autoTranslateProvider = value;
+    processedJobs.value.clear();
+    queuedJobVersion.value += 1;
+  },
+});
+const workspace = computed(() =>
+  activeProvider.value === 'gpt' ? gptWorkspace : sakuraWorkspace,
+);
+const workspaceRef = computed(() => workspace.value.ref.value);
+
+const showLocalVolumeDrawer = ref(false);
+
+const workerTranslatorId = (worker: GptWorker | SakuraWorker) =>
+  'type' in worker ? 'gpt' : 'sakura';
+
+const shouldAutoStart = (worker: GptWorker | SakuraWorker) =>
   setting.value.autoTranslate &&
-  setting.value.autoTranslateProvider === 'gpt' &&
+  workerTranslatorId(worker) === activeProvider.value &&
   worker.autoStart !== false;
 
 watch(
@@ -37,7 +57,7 @@ watch(
 );
 
 const getNextJob = () => {
-  const job = workspace.takeNextJob(new Set(processedJobs.value.keys()));
+  const job = workspace.value.takeNextJob(new Set(processedJobs.value.keys()));
   if (job !== undefined) {
     processedJobs.value.set(job.task, job);
     queuedJobVersion.value += 1;
@@ -50,16 +70,19 @@ const deleteJob = (task: string) => {
     message.error('任务被翻译器占用');
     return;
   }
-  workspace.deleteJob(task);
+  workspace.value.deleteJob(task);
 };
 const deleteAllJobs = () => {
   workspaceRef.value.jobs.forEach((job) => {
     if (processedJobs.value.has(job.task)) {
       return;
     }
-    workspace.deleteJob(job.task);
+    workspace.value.deleteJob(job.task);
   });
 };
+
+const topJob = (job: TranslateJob) => workspace.value.topJob(job);
+const bottomJob = (job: TranslateJob) => workspace.value.bottomJob(job);
 
 const onProgressUpdated = (
   task: string,
@@ -71,8 +94,8 @@ const onProgressUpdated = (
     const job = processedJobs.value.get(task)!;
     processedJobs.value.delete(task);
     if (!state.abort) {
-      workspace.addJobRecord(job);
-      workspace.deleteJob(task);
+      workspace.value.addJobRecord(job);
+      workspace.value.deleteJob(task);
     }
   } else {
     const job = processedJobs.value.get(task)!;
@@ -85,14 +108,30 @@ const onProgressUpdated = (
 };
 
 const clearCache = async () =>
-  doAction(TranslationCacheRepo.clear('gpt-seg-cache'), '缓存清除', message);
+  doAction(
+    TranslationCacheRepo.clear(
+      activeProvider.value === 'gpt' ? 'gpt-seg-cache' : 'sakura-seg-cache',
+    ),
+    '缓存清除',
+    message,
+  );
 </script>
 
 <template>
   <div class="layout-content">
-    <workspace-shell provider="gpt">
+    <workspace-shell :provider="activeProvider">
       <template #workers>
         <n-flex vertical size="small">
+          <c-action-wrapper title="提供商">
+            <c-radio-group
+              v-model:value="activeProvider"
+              :options="[
+                { label: 'LLM', value: 'gpt' },
+                { label: 'Sakura', value: 'sakura' },
+              ]"
+              size="small"
+            />
+          </c-action-wrapper>
           <c-button-confirm
             hint="真的要清空缓存吗？"
             label="清空缓存"
@@ -102,7 +141,7 @@ const clearCache = async () =>
           />
           <n-empty
             v-if="workspaceRef.workers.length === 0"
-            description="没有翻译器，请先到设置里添加 LLM 翻译器"
+            description="没有翻译器，请先到设置里添加翻译器"
           />
           <n-list v-else>
             <vue-draggable
@@ -115,7 +154,10 @@ const clearCache = async () =>
                 :key="worker.id"
               >
                 <job-worker
-                  :worker="{ translatorId: 'gpt', ...worker }"
+                  :worker="{
+                    translatorId: workerTranslatorId(worker),
+                    ...worker,
+                  }"
                   :get-next-job="getNextJob"
                   :job-version="queuedJobVersion"
                   :auto-start="shouldAutoStart(worker)"
@@ -161,8 +203,8 @@ const clearCache = async () =>
               <job-queue
                 :job="job"
                 :progress="processedJobs.get(job.task)?.progress"
-                @top-job="workspace.topJob(job)"
-                @bottom-job="workspace.bottomJob(job)"
+                @top-job="topJob(job)"
+                @bottom-job="bottomJob(job)"
                 @delete-job="deleteJob(job.task)"
               />
             </n-list-item>
@@ -171,13 +213,13 @@ const clearCache = async () =>
       </template>
 
       <template #records>
-        <job-record-section id="gpt" />
+        <job-record-section :id="activeProvider" />
       </template>
     </workspace-shell>
   </div>
 
   <local-volume-list-specific-translation
     v-model:show="showLocalVolumeDrawer"
-    type="gpt"
+    :type="activeProvider"
   />
 </template>

@@ -13,7 +13,6 @@ import {
   RocketLaunchOutlined,
   SettingsOutlined,
   StarBorderOutlined,
-  TranslateOutlined,
   WbSunnyOutlined,
   WorkspacesOutlined,
 } from '@vicons/material';
@@ -105,9 +104,9 @@ const menuOptions = computed<MenuOption[]>(() => {
       key: '/workspace',
       children: [
         {
-          label: renderLabel('开始翻译', '/workspace/gpt'),
+          label: renderLabel('开始翻译', '/workspace'),
           icon: renderIcon(RocketLaunchOutlined),
-          key: '/workspace/gpt',
+          key: '/workspace',
         },
         {
           label: renderLabel('任务设置', '/setting'),
@@ -118,11 +117,6 @@ const menuOptions = computed<MenuOption[]>(() => {
           label: renderLabel('输出设置', '/setting'),
           icon: renderIcon(BuildOutlined),
           key: '/setting/output',
-        },
-        {
-          label: renderLabel('翻译设置', '/workspace/sakura'),
-          icon: renderIcon(TranslateOutlined),
-          key: '/workspace/sakura',
         },
         {
           label: renderLabel('术语表', '/workspace/toolbox'),

@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { FileDownloadOutlined } from '@vicons/material';
-import { useKeyModifier } from '@vueuse/core';
-
 import { WenkuNovelApi } from '@/api';
 import type { TranslateTaskParams } from '@/model/Translator';
 import { TranslateTaskDescriptor } from '@/model/Translator';
@@ -53,8 +51,8 @@ const file = computed(() => {
   return { url, filename };
 });
 
-const shouldTopJob = useKeyModifier('Control');
-const submitJob = (id: 'gpt' | 'sakura') => {
+const submitWorkflowJob = () => {
+  const id = setting.value.autoTranslateProvider;
   const task = TranslateTaskDescriptor.wenku(
     novelId,
     volume.volumeId,
@@ -69,7 +67,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
   const success = workspace.addJob(job);
   if (success) {
     message.success('已加入任务');
-    if (shouldTopJob.value) {
+    if (setting.value.autoTopJobWhenAddTask) {
       workspace.topJob(job);
     }
   } else {
@@ -105,18 +103,13 @@ const submitJob = (id: 'gpt' | 'sakura') => {
         />
 
         <c-button
-          v-if="setting.enabledTranslator.includes('gpt')"
-          label="开始LLM翻译"
+          v-if="
+            setting.enabledTranslator.includes(setting.autoTranslateProvider)
+          "
+          :label="`开始${setting.autoTranslateProvider === 'gpt' ? 'LLM' : 'Sakura'}翻译`"
           size="tiny"
           secondary
-          @action="submitJob('gpt')"
-        />
-        <c-button
-          v-if="setting.enabledTranslator.includes('sakura')"
-          label="开始Sakura翻译"
-          size="tiny"
-          secondary
-          @action="submitJob('sakura')"
+          @action="submitWorkflowJob"
         />
         <c-button-confirm
           v-if="whoami.asAdmin"

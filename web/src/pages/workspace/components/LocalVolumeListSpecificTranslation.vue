@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { DeleteOutlineOutlined } from '@vicons/material';
-import { useKeyModifier } from '@vueuse/core';
-
 import { GenericNovelId } from '@/model/Common';
 import type { LocalVolumeMetadata } from '@/model/LocalVolume';
 import { useBookshelfLocalStore } from '@/pages/bookshelf/BookshelfLocalStore';
@@ -14,6 +12,8 @@ const translateOptions = useTemplateRef('translateOptions');
 const props = defineProps<{
   type: 'gpt' | 'sakura';
 }>();
+
+const activeProvider = computed(() => props.type);
 
 const message = useMessage();
 
@@ -53,21 +53,20 @@ const queueAllVolumes = (volumes: LocalVolumeMetadata[]) => {
   const ids = volumes.map((it) => it.id);
   const { success, failed } = store.queueJobsToWorkspace(ids, {
     level: 'expire',
-    type: props.type,
-    shouldTop: shouldTopJob.value ?? false,
+    type: activeProvider.value,
+    shouldTop: false,
   });
   message.info(`${success}本小说已加入任务，${failed}本失败`);
 };
 
-const shouldTopJob = useKeyModifier('Control');
 const queueVolume = (volumeId: string, total: number = 65536) => {
   const { startIndex, endIndex, level, forceMetadata } =
     translateOptions.value!.getTranslateTaskParams();
   const taskNumber = translateOptions.value!.getTaskNumber();
   const success = store.queueJobToWorkspace(volumeId, {
     level: level,
-    type: props.type,
-    shouldTop: shouldTopJob.value ?? false,
+    type: activeProvider.value,
+    shouldTop: false,
     startIndex: startIndex,
     endIndex: endIndex,
     taskNumber: taskNumber,

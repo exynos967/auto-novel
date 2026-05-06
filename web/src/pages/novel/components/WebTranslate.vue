@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useKeyModifier } from '@vueuse/core';
 import ky from 'ky';
 
 import { WebNovelApi } from '@/api';
@@ -107,8 +106,8 @@ const importToWorkspace = async () => {
     .catch((error) => message.error(`导入失败:${error}`));
 };
 
-const pressControl = useKeyModifier('Control');
-const submitJob = (id: 'gpt' | 'sakura') => {
+const submitWorkflowJob = () => {
+  const id = setting.value.autoTranslateProvider;
   const { startIndex, endIndex, level, forceMetadata } =
     translateOptions.value!.getTranslateTaskParams();
   const taskNumber = translateOptions.value!.getTaskNumber();
@@ -154,7 +153,7 @@ const submitJob = (id: 'gpt' | 'sakura') => {
     };
     const success = workspace.addJob(job);
     if (success) {
-      if (setting.value.autoTopJobWhenAddTask || pressControl.value) {
+      if (setting.value.autoTopJobWhenAddTask) {
         workspace.topJob(job);
       }
     }
@@ -201,16 +200,12 @@ const submitJob = (id: 'gpt' | 'sakura') => {
           @action="startTranslateTask('youdao')"
         />
         <c-button
-          v-if="setting.enabledTranslator.includes('gpt')"
-          label="开始LLM翻译"
+          v-if="
+            setting.enabledTranslator.includes(setting.autoTranslateProvider)
+          "
+          :label="`开始${setting.autoTranslateProvider === 'gpt' ? 'LLM' : 'Sakura'}翻译`"
           :round="false"
-          @action="submitJob('gpt')"
-        />
-        <c-button
-          v-if="setting.enabledTranslator.includes('sakura')"
-          label="开始Sakura翻译"
-          :round="false"
-          @action="submitJob('sakura')"
+          @action="submitWorkflowJob"
         />
       </n-button-group>
     </template>

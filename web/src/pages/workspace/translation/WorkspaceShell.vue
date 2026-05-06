@@ -14,11 +14,9 @@ import type { Component } from 'vue';
 import type { WorkflowStage } from '@/domain/translate/workflow';
 import { defaultWorkflowProfile } from '@/domain/translate/workflow';
 
-const props = defineProps<{
+defineProps<{
   provider: 'gpt' | 'sakura';
 }>();
-
-const title = computed(() => (props.provider === 'gpt' ? 'LLM' : 'Sakura'));
 
 const profile = ref(defaultWorkflowProfile());
 
@@ -39,7 +37,7 @@ const enabledStages = computed(() =>
     <section class="workspace-hero">
       <div>
         <n-text depth="3">翻译工作台</n-text>
-        <h1>{{ title }} 工作流</h1>
+        <h1>翻译工作流</h1>
         <p>
           按 AiNiee
           的思路组织提取、翻译、校对和润色流程；任务、翻译器、工作流设置和记录集中在同一个工作台里。

@@ -172,29 +172,18 @@ const router = createRouter({
 
         {
           path: '/workspace',
-          redirect: '/workspace/gpt',
-          children: [
-            {
-              path: 'gpt',
-              meta: { title: 'LLM工作流' },
-              component: () => import('./pages/workspace/GptWorkspace.vue'),
-            },
-            {
-              path: 'sakura',
-              meta: { title: 'Sakura工作流' },
-              component: () => import('./pages/workspace/SakuraWorkspace.vue'),
-            },
-            {
-              path: 'interactive',
-              meta: { title: '交互翻译' },
-              component: () => import('./pages/workspace/Interactive.vue'),
-            },
-            {
-              path: 'toolbox',
-              meta: { title: '小说工具箱' },
-              component: () => import('./pages/workspace/Toolbox.vue'),
-            },
-          ],
+          meta: { title: '翻译工作流' },
+          component: () => import('./pages/workspace/TranslationWorkspace.vue'),
+        },
+        {
+          path: '/workspace/interactive',
+          meta: { title: '交互翻译' },
+          component: () => import('./pages/workspace/Interactive.vue'),
+        },
+        {
+          path: '/workspace/toolbox',
+          meta: { title: '提示词与公共表格' },
+          component: () => import('./pages/workspace/Toolbox.vue'),
         },
 
         {
@@ -233,7 +222,6 @@ const router = createRouter({
         // 兼容旧路由
         { path: '/novel-list', redirect: '/novel' }, // 2024-06-25
         { path: '/wenku-list', redirect: '/wenku' }, // 2024-06-25
-        { path: '/sakura-workspace', redirect: '/workspace/sakura' },
 
         // 404
         {

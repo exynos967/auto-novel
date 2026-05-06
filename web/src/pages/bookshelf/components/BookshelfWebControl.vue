@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { useKeyModifier } from '@vueuse/core';
-
 import { TranslateTaskDescriptor } from '@/model/Translator';
 import type { WebNovelOutlineDto } from '@/model/WebNovel';
 import { FavoredRepo, useSettingStore, useWorkspaceStore } from '@/stores';
@@ -92,9 +90,8 @@ const translateLevel = ref<'normal' | 'expire' | 'all'>('normal');
 const forceMetadata = ref(false);
 const first5 = ref(false);
 const reverseOrder = ref(false);
-const shouldTopJob = useKeyModifier('Control');
-
-const queueJobs = (type: 'gpt' | 'sakura') => {
+const queueWorkflowJobs = () => {
+  const type = setting.value.autoTranslateProvider;
   let novels = props.selectedNovels;
   if (novels.length === 0) {
     message.info('没有选中小说');
@@ -121,7 +118,7 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
       createAt: Date.now(),
     };
     const success = workspace.addJob(job);
-    if (success && shouldTopJob.value) {
+    if (success && setting.value.autoTopJobWhenAddTask) {
       workspace.topJob(job);
     }
     if (!success) {
@@ -257,16 +254,12 @@ const queueJobs = (type: 'gpt' | 'sakura') => {
 
         <n-button-group size="small">
           <c-button
-            v-if="setting.enabledTranslator.includes('gpt')"
-            label="开始LLM翻译"
+            v-if="
+              setting.enabledTranslator.includes(setting.autoTranslateProvider)
+            "
+            :label="`开始${setting.autoTranslateProvider === 'gpt' ? 'LLM' : 'Sakura'}翻译`"
             :round="false"
-            @action="queueJobs('gpt')"
-          />
-          <c-button
-            v-if="setting.enabledTranslator.includes('sakura')"
-            label="开始Sakura翻译"
-            :round="false"
-            @action="queueJobs('sakura')"
+            @action="queueWorkflowJobs"
           />
         </n-button-group>
       </n-flex>

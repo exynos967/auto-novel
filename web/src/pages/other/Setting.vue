@@ -44,9 +44,6 @@ const clearWenkuSearchHistory = () => {
           <b>快捷键说明</b>
           <n-ul>
             <n-li>列表页面，可以使用左右方向键翻页。</n-li>
-            <n-li>
-              LLM/Sakura开始翻译按钮，按住Ctrl键点击，会将任务自动置顶。
-            </n-li>
             <n-li>阅读页面，可以使用左右方向键跳转上/下一章。</n-li>
             <n-li>阅读页面，可以使用数字键1～4快速切换翻译。</n-li>
           </n-ul>
@@ -96,10 +93,10 @@ const clearWenkuSearchHistory = () => {
         <n-flex vertical>
           <b>工作区</b>
           <n-checkbox v-model:checked="setting.autoTopJobWhenAddTask">
-            工作区添加时自动置顶
+            添加翻译任务时自动置顶
           </n-checkbox>
           <n-checkbox v-model:checked="setting.autoTranslate">
-            进入工作区自动开始翻译
+            进入翻译工作流自动开始翻译
           </n-checkbox>
           <n-flex v-if="setting.autoTranslate" align="center">
             自动翻译提供商
