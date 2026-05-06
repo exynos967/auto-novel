@@ -8,12 +8,15 @@ import type {
 import { delay } from '@/util';
 
 import type { Translator } from './Translator';
+import { translateWithWorkflow } from './workflow';
+import type { WorkflowProfile } from './workflow';
 
 export const translateWeb = async (
   { providerId, novelId }: WebTranslateTaskDesc,
   { level, forceMetadata, startIndex, endIndex }: TranslateTaskParams,
   callback: TranslateTaskCallback,
   translator: Translator,
+  workflowProfile: WorkflowProfile,
   signal?: AbortSignal,
 ) => {
   const {
@@ -197,13 +200,19 @@ export const translateWeb = async (
 
         callback.onChapterSuccess({});
       } else {
-        const textsZh = await translator.translate(cTask.paragraphJp, {
-          glossary: cTask.glossary,
-          oldTextZh: cTask.oldParagraphZh,
-          oldGlossary: cTask.oldGlossary,
-          force: forceSeg,
-          signal,
-        });
+        const textsZh = await translateWithWorkflow(
+          translator,
+          cTask.paragraphJp,
+          {
+            glossary: cTask.glossary,
+            oldTextZh: cTask.oldParagraphZh,
+            oldGlossary: cTask.oldGlossary,
+            force: forceSeg,
+            profile: workflowProfile,
+            log: callback.log,
+            signal,
+          },
+        );
         callback.log(`上传章节`);
         const { jp, zh } = await updateChapterTranslation(chapterId, {
           glossaryId: cTask.glossaryId,

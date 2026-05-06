@@ -10,12 +10,15 @@ import type {
 } from '@/model/Translator';
 import { useLocalVolumeStore } from '@/stores';
 import type { Translator } from './Translator';
+import { translateWithWorkflow } from './workflow';
+import type { WorkflowProfile } from './workflow';
 
 export const translateLocal = async (
   { volumeId }: LocalTranslateTaskDesc,
   { level, startIndex, endIndex }: TranslateTaskParams,
   callback: TranslateTaskCallback,
   translator: Translator,
+  workflowProfile: WorkflowProfile,
   signal?: AbortSignal,
 ) => {
   const localVolumeRepository = await useLocalVolumeStore();
@@ -91,13 +94,15 @@ export const translateLocal = async (
         volumeId,
         chapterId,
       );
-      const textsZh = await translator.translate(textsJp, {
+      const textsZh = await translateWithWorkflow(translator, textsJp, {
         glossary: metadata.glossary,
         oldGlossary: chapter[translator.id]?.glossary,
         oldTextZh: oldTextsZh
           ? oldTextsZh[translator.id]?.paragraphs
           : undefined,
         force: forceSeg,
+        profile: workflowProfile,
+        log: callback.log,
         signal,
       });
 

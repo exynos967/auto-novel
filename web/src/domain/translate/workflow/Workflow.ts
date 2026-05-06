@@ -1,5 +1,4 @@
-import { Translator } from '../Translator';
-import type { TranslatorConfig } from '../Translator';
+import type { Translator } from '../Translator';
 import type { Glossary } from '@/model/Glossary';
 import type { TranslateTaskCallback } from '@/model/Translator';
 
@@ -38,9 +37,11 @@ export interface WorkflowProfile {
   promptPreset: 'basic' | 'novel' | 'faithful';
   lineLimit: number;
   roundLimit: number;
+  progressiveSplit: boolean;
   responseChecks: {
     lineCount: boolean;
     emptyLine: boolean;
+    returnOriginal: boolean;
     residualSource: boolean;
     forbiddenTerms: boolean;
   };
@@ -73,9 +74,11 @@ export const defaultWorkflowProfile = (): WorkflowProfile => ({
   promptPreset: 'novel',
   lineLimit: 30,
   roundLimit: 3,
+  progressiveSplit: true,
   responseChecks: {
     lineCount: true,
     emptyLine: true,
+    returnOriginal: true,
     residualSource: true,
     forbiddenTerms: true,
   },
@@ -162,6 +165,13 @@ const containsSourceText = (source: string[], translated: string[]) => {
   );
 };
 
+const isSameAsSource = (source: string[], translated: string[]) =>
+  source.some((line, index) => {
+    const sourceLine = line.trim();
+    const translatedLine = translated[index]?.trim() ?? '';
+    return sourceLine.length > 0 && sourceLine === translatedLine;
+  });
+
 export const checkTranslatedLines = (
   source: string[],
   translated: string[],
@@ -180,14 +190,18 @@ export const checkTranslatedLines = (
     return { ok: false, reason: '存在空译文' };
   }
 
+  if (checks.returnOriginal && isSameAsSource(source, translated)) {
+    return { ok: false, reason: '译文疑似返回原文' };
+  }
+
   if (checks.residualSource && containsSourceText(source, translated)) {
     return { ok: false, reason: '译文疑似残留完整原文' };
   }
 
   if (checks.forbiddenTerms) {
-    const forbidden = profile.dictionary.forbiddenTerms.find((term) =>
-      translated.some((line) => line.includes(term.source)),
-    );
+    const forbidden = profile.dictionary.forbiddenTerms
+      .filter((term) => term.source.trim().length > 0)
+      .find((term) => translated.some((line) => line.includes(term.source)));
     if (forbidden !== undefined) {
       return { ok: false, reason: `译文包含禁翻词：${forbidden.source}` };
     }
@@ -196,7 +210,8 @@ export const checkTranslatedLines = (
   return { ok: true };
 };
 
-export const runWorkflowTranslation = async (
+export const translateWithWorkflow = async (
+  translator: Translator,
   textJp: string[],
   context: {
     glossary: Glossary;
@@ -204,18 +219,11 @@ export const runWorkflowTranslation = async (
     oldGlossary?: Glossary;
     force?: boolean;
     profile?: WorkflowProfile;
-    translatorConfig: TranslatorConfig;
     signal?: AbortSignal;
     log?: TranslateTaskCallback['log'];
   },
 ) => {
   const profile = context.profile ?? defaultWorkflowProfile();
-  const translator = await Translator.create(
-    context.translatorConfig,
-    true,
-    (message, detail) => context.log?.('　' + message, detail),
-  );
-
   context.log?.(`工作流：${profile.name}`);
   context.log?.(`阶段：${profile.stages.join(' → ')}`);
 
@@ -225,35 +233,66 @@ export const runWorkflowTranslation = async (
   for (const segment of plan.segments) {
     context.log?.(`分段 ${segment.index + 1}/${plan.segments.length}`);
     let lastError: unknown;
-    for (let round = 0; round < profile.roundLimit; round += 1) {
-      try {
-        const translated = await translator.translate(segment.lines, {
-          glossary: segment.glossary,
-          oldTextZh: context.oldTextZh?.slice(segment.start, segment.end),
-          oldGlossary: context.oldGlossary,
-          force: context.force,
-          signal: context.signal,
-        });
-        const checked = checkTranslatedLines(
-          segment.lines,
-          translated,
-          profile,
-        );
-        if (!checked.ok) {
-          throw new Error(checked.reason);
+    const originalSegmentor = translator.segTranslator.segmentor;
+    try {
+      for (let round = 0; round < profile.roundLimit; round += 1) {
+        try {
+          if (profile.progressiveSplit && round > 0) {
+            const nextLineLimit = Math.max(
+              1,
+              Math.floor(segment.lines.length / (round + 1)),
+            );
+            translator.segTranslator.segmentor = (lines, oldLines) => {
+              const chunks: [string[], string[]?][] = [];
+              for (let i = 0; i < lines.length; i += nextLineLimit) {
+                const chunkLines = lines.slice(i, i + nextLineLimit);
+                const oldChunkLines = oldLines?.slice(i, i + nextLineLimit);
+                if (oldChunkLines === undefined) {
+                  chunks.push([chunkLines]);
+                } else {
+                  chunks.push([chunkLines, oldChunkLines]);
+                }
+              }
+              return chunks;
+            };
+            context.log?.(
+              `第 ${round + 1} 轮启用更小分段：${nextLineLimit} 行`,
+            );
+          } else {
+            translator.segTranslator.segmentor = originalSegmentor;
+          }
+
+          const translated = await translator.translate(segment.lines, {
+            glossary: segment.glossary,
+            oldTextZh: context.oldTextZh?.slice(segment.start, segment.end),
+            oldGlossary: context.oldGlossary,
+            workflow: profile,
+            force: context.force,
+            signal: context.signal,
+          });
+          const checked = checkTranslatedLines(
+            segment.lines,
+            translated,
+            profile,
+          );
+          if (!checked.ok) {
+            throw new Error(checked.reason);
+          }
+          translatedSegments.push(
+            applyReplacements(translated, profile.dictionary, 'after'),
+          );
+          lastError = undefined;
+          break;
+        } catch (e) {
+          lastError = e;
+          context.log?.(`第 ${round + 1} 轮失败：${e}`);
         }
-        translatedSegments.push(
-          applyReplacements(translated, profile.dictionary, 'after'),
-        );
-        lastError = undefined;
-        break;
-      } catch (e) {
-        lastError = e;
-        context.log?.(`第 ${round + 1} 轮失败：${e}`);
       }
-    }
-    if (lastError !== undefined) {
-      throw lastError;
+      if (lastError !== undefined) {
+        throw lastError;
+      }
+    } finally {
+      translator.segTranslator.segmentor = originalSegmentor;
     }
   }
 

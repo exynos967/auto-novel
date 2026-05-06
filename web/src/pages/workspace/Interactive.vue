@@ -1,9 +1,14 @@
 <script lang="ts" setup>
-import type { TranslatorConfig } from '@/domain/translate';
 import { Translator } from '@/domain/translate';
+import type { TranslatorConfig } from '@/domain/translate';
+import { translateWithWorkflow } from '@/domain/translate/workflow';
 import type { Glossary } from '@/model/Glossary';
 import type { GptWorker, SakuraWorker, TranslatorId } from '@/model/Translator';
-import { useGptWorkspaceStore, useSakuraWorkspaceStore } from '@/stores';
+import {
+  useGptWorkspaceStore,
+  useSakuraWorkspaceStore,
+  useTranslationWorkflowStore,
+} from '@/stores';
 
 const message = useMessage();
 
@@ -28,6 +33,9 @@ const selectedGptWorkerId = ref(gptWorkspaceRef.value.workers[0]?.id);
 
 const sakuraWorkspaceRef = useSakuraWorkspaceStore().ref;
 const selectedSakuraWorkerId = ref(sakuraWorkspaceRef.value.workers[0]?.id);
+const workflowProfile = computed(
+  () => useTranslationWorkflowStore().state.value.profile,
+);
 
 interface SavedTranslation {
   id: TranslatorId;
@@ -40,9 +48,12 @@ const savedTranslation = ref<SavedTranslation[]>([]);
 
 const glossary = ref<Glossary>({});
 
-const translate = async () => {
-  let config: TranslatorConfig;
-  let selectedWorker: GptWorker | SakuraWorker | undefined;
+const buildTranslatorConfig = ():
+  | {
+      config: TranslatorConfig;
+      selectedWorker: GptWorker | SakuraWorker;
+    }
+  | undefined => {
   const id = translatorId.value;
   if (id === 'gpt') {
     const worker = gptWorkspaceRef.value.workers.find(
@@ -50,51 +61,61 @@ const translate = async () => {
     );
     if (worker === undefined) {
       message.error('未选择LLM翻译器');
-      return;
+      return undefined;
     }
-    selectedWorker = worker;
-    config = {
-      id,
-      type: worker.type,
-      model: worker.model,
-      endpoint: worker.endpoint,
-      key: worker.key,
+    return {
+      selectedWorker: worker,
+      config: {
+        id,
+        type: worker.type,
+        model: worker.model,
+        endpoint: worker.endpoint,
+        key: worker.key,
+      },
     };
-  } else {
-    const worker = sakuraWorkspaceRef.value.workers.find(
-      (it) => it.id === selectedSakuraWorkerId.value,
-    );
-    if (worker === undefined) {
-      message.error('未选择Sakura翻译器');
-      return;
-    }
-    selectedWorker = worker;
-    config = {
+  }
+
+  const worker = sakuraWorkspaceRef.value.workers.find(
+    (it) => it.id === selectedSakuraWorkerId.value,
+  );
+  if (worker === undefined) {
+    message.error('未选择Sakura翻译器');
+    return undefined;
+  }
+  return {
+    selectedWorker: worker,
+    config: {
       id,
       endpoint: worker.endpoint,
       segLength: worker.segLength,
       prevSegLength: worker.prevSegLength,
-    };
-  }
+    },
+  };
+};
 
+const translate = async () => {
+  const translatorConfig = buildTranslatorConfig();
+  if (translatorConfig === undefined) return;
+
+  const { config, selectedWorker } = translatorConfig;
   try {
     const translator = await Translator.create(config, false);
     const linesJp = textJp.value.split('\n');
-    const linesZh = await translator.translate(linesJp, {
+    const linesZh = await translateWithWorkflow(translator, linesJp, {
       glossary: glossary.value,
+      profile: workflowProfile.value,
     });
     textZh.value = linesZh.join('\n');
+    savedTranslation.value.push({
+      id: translatorId.value,
+      workerId: selectedWorker.id,
+      endpoint: selectedWorker.endpoint,
+      jp: textJp.value,
+      zh: textZh.value,
+    });
   } catch (e: unknown) {
     message.error(`翻译器错误：${e}`);
   }
-
-  savedTranslation.value.push({
-    id,
-    workerId: selectedWorker?.id,
-    endpoint: selectedWorker?.endpoint,
-    jp: textJp.value,
-    zh: textZh.value,
-  });
 };
 const clearTranslation = () => {
   textJp.value = '';

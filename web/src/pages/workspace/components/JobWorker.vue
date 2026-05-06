@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import {
   DragIndicatorOutlined,
-  FontDownloadOffOutlined,
-  FontDownloadOutlined,
   PlayArrowOutlined,
   StopOutlined,
 } from '@vicons/material';
@@ -67,8 +65,6 @@ const endpointPrefix = computed(() => {
   }
 });
 
-const enableAutoMode = ref(props.autoStart);
-
 const translateTask = useTemplateRef('translateTask');
 const currentJob = ref<{
   task: string;
@@ -111,7 +107,7 @@ const processTasks = async () => {
       abort: state === 'abort',
     });
 
-    if (state !== 'complete' || !enableAutoMode.value) {
+    if (state !== 'complete' || !props.autoStart) {
       break;
     }
   }
@@ -128,7 +124,7 @@ const stopWorker = () => {
 };
 
 onMounted(() => {
-  if (enableAutoMode.value) {
+  if (props.autoStart) {
     startWorker();
   }
 });
@@ -136,7 +132,7 @@ onMounted(() => {
 watch(
   () => props.jobVersion,
   () => {
-    if (enableAutoMode.value && !running.value) {
+    if (props.autoStart && !running.value) {
       startWorker();
     }
   },
@@ -145,7 +141,6 @@ watch(
 watch(
   () => props.autoStart,
   (autoStart) => {
-    enableAutoMode.value = autoStart;
     if (autoStart && !running.value) {
       startWorker();
     }
@@ -197,18 +192,9 @@ watch(
           @action="startWorker"
         />
 
-        <c-icon-button
-          v-if="enableAutoMode"
-          tooltip="自动继续翻译：已开启"
-          :icon="FontDownloadOutlined"
-          @action="enableAutoMode = false"
-        />
-        <c-icon-button
-          v-else
-          tooltip="自动继续翻译：已关闭"
-          :icon="FontDownloadOffOutlined"
-          @action="enableAutoMode = true"
-        />
+        <n-tag v-if="autoStart" size="small" type="success" :bordered="false">
+          自动
+        </n-tag>
       </n-flex>
     </template>
   </n-thing>

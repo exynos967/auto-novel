@@ -7,12 +7,15 @@ import type {
 } from '@/model/Translator';
 
 import type { Translator } from './Translator';
+import { translateWithWorkflow } from './workflow';
+import type { WorkflowProfile } from './workflow';
 
 export const translateWenku = async (
   { novelId, volumeId }: WenkuTranslateTaskDesc,
   { level }: TranslateTaskParams,
   callback: TranslateTaskCallback,
   translator: Translator,
+  workflowProfile: WorkflowProfile,
   signal?: AbortSignal,
 ) => {
   const {
@@ -73,13 +76,19 @@ export const translateWenku = async (
         callback.log(`无需翻译`);
         callback.onChapterSuccess({});
       } else {
-        const textsZh = await translator.translate(cTask.paragraphJp, {
-          glossary: cTask.glossary,
-          oldTextZh: cTask.oldParagraphZh,
-          oldGlossary: cTask.oldGlossary,
-          force: forceSeg,
-          signal,
-        });
+        const textsZh = await translateWithWorkflow(
+          translator,
+          cTask.paragraphJp,
+          {
+            glossary: cTask.glossary,
+            oldTextZh: cTask.oldParagraphZh,
+            oldGlossary: cTask.oldGlossary,
+            force: forceSeg,
+            profile: workflowProfile,
+            log: callback.log,
+            signal,
+          },
+        );
         callback.log('上传章节');
         const state = await updateChapterTranslation(chapterId, {
           glossaryId: cTask.glossaryId,

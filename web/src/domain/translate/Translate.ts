@@ -3,6 +3,7 @@ import type {
   TranslateTaskDesc,
   TranslateTaskParams,
 } from '@/model/Translator';
+import { useTranslationWorkflowStore } from '@/stores';
 
 import { translateLocal } from './TranslateLocal';
 import { translateWeb } from './TranslateWeb';
@@ -17,6 +18,7 @@ export const translate = async (
   translatorConfig: TranslatorConfig,
   signal?: AbortSignal,
 ) => {
+  const workflowProfile = useTranslationWorkflowStore().state.value.profile;
   let translator: Translator;
   try {
     translator = await Translator.create(
@@ -36,13 +38,21 @@ export const translate = async (
   }
 
   if (taskDesc.type === 'web') {
-    return translateWeb(taskDesc, taskParams, taskCallback, translator, signal);
+    return translateWeb(
+      taskDesc,
+      taskParams,
+      taskCallback,
+      translator,
+      workflowProfile,
+      signal,
+    );
   } else if (taskDesc.type === 'wenku') {
     return translateWenku(
       taskDesc,
       taskParams,
       taskCallback,
       translator,
+      workflowProfile,
       signal,
     );
   } else {
@@ -51,6 +61,7 @@ export const translate = async (
       taskParams,
       taskCallback,
       translator,
+      workflowProfile,
       signal,
     );
   }

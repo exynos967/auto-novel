@@ -4,6 +4,7 @@ import { customAlphabet } from 'nanoid';
 import { TranslationCacheRepo } from '@/repos';
 import type { Glossary } from '@/model/Glossary';
 import type { TranslatorId } from '@/model/Translator';
+import type { WorkflowProfile } from './workflow';
 
 export type Segmentor = (
   textJp: string[],
@@ -15,6 +16,7 @@ export type Logger = (message: string, detail?: string[]) => void;
 export type SegmentContext = {
   glossary: Glossary;
   prevSegs: string[][];
+  workflow?: WorkflowProfile;
   signal?: AbortSignal;
 };
 

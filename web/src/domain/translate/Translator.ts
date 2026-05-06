@@ -8,6 +8,7 @@ import { SakuraTranslator } from './TranslatorSakura';
 import type { Logger, SegmentCache, SegmentTranslator } from './Common';
 import { createSegIndexedDbCache } from './Common';
 import { RegexUtil } from '@/util';
+import type { WorkflowProfile } from './workflow';
 
 export type TranslatorConfig =
   | ({ id: 'gpt' } & OpenAiTranslator.Config)
@@ -56,6 +57,7 @@ export class Translator {
       glossary?: Glossary;
       oldTextZh?: string[] | undefined;
       oldGlossary?: Glossary;
+      workflow?: WorkflowProfile;
       force?: boolean;
       signal?: AbortSignal;
     },
@@ -96,6 +98,7 @@ export class Translator {
       oldSegZh,
       oldGlossary,
       prevSegs,
+      workflow,
       force,
       signal,
     }: {
@@ -104,6 +107,7 @@ export class Translator {
       oldSegZh?: string[];
       oldGlossary?: Glossary;
       prevSegs: string[][];
+      workflow?: WorkflowProfile;
       force?: boolean;
       signal?: AbortSignal;
     },
@@ -148,6 +152,7 @@ export class Translator {
     const segOutput = await this.segTranslator.translate(seg, {
       glossary: segGlossary,
       prevSegs,
+      workflow,
       signal,
     });
     if (segOutput.length !== seg.length) {
