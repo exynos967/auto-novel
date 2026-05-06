@@ -5,7 +5,6 @@ import {
   BookOutlined,
   CandlestickChartOutlined,
   DarkModeOutlined,
-  HistoryOutlined,
   HomeOutlined,
   ImportExportOutlined,
   LanguageOutlined,
@@ -90,12 +89,6 @@ const menuOptions = computed<MenuOption[]>(() => {
           key: '/favorite',
         },
         {
-          label: renderLabel('阅读历史', '/read-history'),
-          icon: renderIcon(HistoryOutlined),
-          key: '/read-history',
-          show: whoami.value.isSignedIn,
-        },
-        {
           label: renderLabel('网络小说', '/novel'),
           icon: renderIcon(LanguageOutlined),
           key: '/novel',
@@ -116,16 +109,6 @@ const menuOptions = computed<MenuOption[]>(() => {
           label: renderLabel('开始翻译', '/workspace'),
           icon: renderIcon(RocketLaunchOutlined),
           key: '/workspace',
-        },
-        {
-          label: renderLabel('任务设置', '/workspace/task-settings'),
-          icon: renderIcon(ListAltOutlined),
-          key: '/workspace/task-settings',
-        },
-        {
-          label: renderLabel('输出设置', '/workspace/output-settings'),
-          icon: renderIcon(SettingsOutlined),
-          key: '/workspace/output-settings',
         },
       ],
     },
@@ -163,6 +146,11 @@ const menuOptions = computed<MenuOption[]>(() => {
           label: renderLabel('润色提示词', '/workspace/prompts/polish'),
           icon: renderIcon(AutoFixHighOutlined),
           key: '/workspace/prompts/polish',
+        },
+        {
+          label: renderLabel('预设管理', '/workspace/prompts/presets'),
+          icon: renderIcon(BookOutlined),
+          key: '/workspace/prompts/presets',
         },
       ],
     },
@@ -202,6 +190,16 @@ const menuOptions = computed<MenuOption[]>(() => {
           label: renderLabel('设置', '/setting'),
           icon: renderIcon(SettingsOutlined),
           key: '/setting',
+        },
+        {
+          label: renderLabel('任务设置', '/workspace/task-settings'),
+          icon: renderIcon(ListAltOutlined),
+          key: '/workspace/task-settings',
+        },
+        {
+          label: renderLabel('输出设置', '/workspace/output-settings'),
+          icon: renderIcon(SettingsOutlined),
+          key: '/workspace/output-settings',
         },
         {
           label: () =>
@@ -412,7 +410,6 @@ watch(
             'Index',
             'BookshelfWeb',
             'BookshelfWenku',
-            'ReadHistoryList',
             'WebNovelList',
             'WenkuNovelList',
           ]"

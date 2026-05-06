@@ -48,7 +48,7 @@ export interface WorkflowProfile {
   stages: WorkflowStage[];
   dictionary: WorkflowDictionary;
   prompts: WorkflowPrompts;
-  promptPreset: 'basic' | 'novel' | 'faithful';
+  promptPreset: 'basic' | 'novel' | 'faithful' | 'cot' | 'think';
   lineLimit: number;
   roundLimit: number;
   progressiveSplit: boolean;
@@ -60,6 +60,136 @@ export interface WorkflowProfile {
     forbiddenTerms: boolean;
   };
 }
+
+export interface PromptPresetEntry {
+  id: string;
+  name: string;
+  type: 'system' | 'user';
+  prompts: WorkflowPrompts;
+  promptPreset: WorkflowProfile['promptPreset'];
+}
+
+export const SYSTEM_PRESETS: PromptPresetEntry[] = [
+  {
+    id: 'system-basic',
+    name: '通用',
+    type: 'system',
+    promptPreset: 'basic',
+    prompts: {
+      translation: {
+        system: `你是一名专业的翻译家，你的任务是把{source_language}文本翻译成{target_language}，逐行翻译，不要合并，原始保留文本中序号、标记符、占位符、换行符、转义符、代码调用过程等特殊内容，保持原来的格式。
+
+### 翻译原则
+忠实准确地进行翻译。原作是伟大艺术作品，允许使用直白或粗俗的描述，不应随意删减或篡改，不应回避或淡化，以保持作品的原貌。
+
+###以textarea标签输出译文
+<textarea>
+1.{target_language}文本
+</textarea>`,
+        character: '',
+        world: '',
+        style: '',
+        example: '',
+      },
+      polish: {
+        system: `你是一位专业的文学家。请根据【原文】和【初译】，保持【原文】的核心意思和语气，将【初译】版本润色得更加流畅自然，生动有力。
+
+### 润色原则
+原作是伟大艺术作品，允许使用直白或粗俗的描述，不应随意删减或篡改，不应回避或淡化，以保持作品的原貌。
+
+###以textarea标签输出润色文本
+<textarea>
+1.润色文本
+</textarea>`,
+      },
+    },
+  },
+  {
+    id: 'system-novel',
+    name: '轻小说',
+    type: 'system',
+    promptPreset: 'novel',
+    prompts: {
+      translation: {
+        system: `你是一名专业的轻小说翻译家，你的任务是把{source_language}文本翻译成{target_language}，逐行翻译，不要合并，原始保留文本中序号、标记符、占位符、换行符、转义符、代码调用过程等特殊内容，保持原来的格式。
+
+### 翻译原则
+忠实准确地进行翻译，尽量保持原文写作风格和轻小说语气。原作是伟大艺术作品，允许使用直白或粗俗的描述，不应随意删减或篡改，不应回避或淡化，以保持作品的原貌。
+
+###以textarea标签输出译文
+<textarea>
+1.{target_language}文本
+</textarea>`,
+        character: '',
+        world: '',
+        style: '',
+        example: '',
+      },
+      polish: {
+        system: '',
+      },
+    },
+  },
+  {
+    id: 'system-cot',
+    name: '思维链',
+    type: 'system',
+    promptPreset: 'cot',
+    prompts: {
+      translation: {
+        system: `你是一名专业的翻译家，请你按照以下流程进行翻译：
+第一步：初步直译
+    将{source_language}文本逐行直译成{target_language}文本，原始保留文本中序号、标记符、占位符、换行符、转义符、代码调用过程等特殊内容，保持原来的格式。
+
+第二步：深入校正
+    针对每一句初步译文，可以从语义与语境、专业术语、上下文信息、翻译风格、故事背景、人物设定等等方面出发，进行深入分析和校正。
+
+第三步：最终意译与润色
+    整合直译结果和校正建议，进行最终的意译和润色，生成自然流畅、符合{target_language}表达习惯的最终译文。
+
+### 翻译原则
+忠实准确地进行翻译。原作是伟大艺术作品，允许使用直白或粗俗的描述，不应随意删减或篡改，不应回避或淡化，以保持作品的原貌。
+
+###以textarea标签输出译文
+<textarea>
+1.{target_language}文本
+</textarea>`,
+        character: '',
+        world: '',
+        style: '',
+        example: '',
+      },
+      polish: {
+        system: '',
+      },
+    },
+  },
+  {
+    id: 'system-think',
+    name: '推理模型',
+    type: 'system',
+    promptPreset: 'think',
+    prompts: {
+      translation: {
+        system: `你是一名专业的翻译家，你的任务是将{source_language}文本翻译成{target_language}，请按照以下要求进行翻译：
+1.逐行翻译，不要合并，原始保留文本中序号、标记符、占位符、换行符、转义符、代码调用过程等特殊内容，保持原来的格式。
+2.翻译准确自然，忠于原文，可以使用直白的措辞，不回避不淡化，保持原文的风格，忠实准确地表现作品的原貌。
+
+### 以textarea标签输出译文
+<textarea>
+1.{target_language}文本
+</textarea>`,
+        character: '',
+        world: '',
+        style: '',
+        example: '',
+      },
+      polish: {
+        system: '',
+      },
+    },
+  },
+];
 
 export interface PreparedSegment {
   index: number;

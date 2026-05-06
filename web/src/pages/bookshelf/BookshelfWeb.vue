@@ -4,13 +4,10 @@ import { ChecklistOutlined } from '@vicons/material';
 import { useIsWideScreen } from '@/pages/util';
 import { WebNovelRepo } from '@/repos';
 import { useSettingStore, useWhoamiStore } from '@/stores';
-import {
-  onUpdateListValue,
-  onUpdatePage,
-  parseWebListValueProvider,
-} from '../list/option';
-import type { WebFavoredListValue } from './option';
-import { getWebFavoredListOptions, parseFavoredListValueSort } from './option';
+import { onUpdatePage } from '../list/option';
+import { parseFavoredListValueSort } from './option';
+
+const router = useRouter();
 
 const props = defineProps<{
   page: number;
@@ -27,38 +24,37 @@ const { whoami } = storeToRefs(whoamiStore);
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
 
-const listOptions = getWebFavoredListOptions(
-  whoami.value.hasNsfwAccess,
-  setting.value.favoriteCreateTimeFirst,
-);
-
-const listValue = computed(
-  () =>
-    <WebFavoredListValue>{
-      搜索: props.query,
-      来源: props.selected[0] ?? 0xff,
-      类型: props.selected[1] ?? 0,
-      分级: props.selected[2] ?? 0,
-      翻译: props.selected[3] ?? 0,
-      排序: props.selected[4] ?? 0,
-    },
-);
+const searchQuery = ref(props.query);
 
 const { data: novelPage, error } = WebNovelRepo.useWebNovelFavoredList(
   () => props.page,
   () => props.favoredId,
   () => ({
-    query: listValue.value.搜索,
-    provider: parseWebListValueProvider(listValue.value.来源),
-    type: listValue.value.类型,
-    level: listValue.value.分级,
-    translate: listValue.value.翻译,
-    sort: parseFavoredListValueSort(listOptions.排序, listValue.value.排序),
+    query: props.query,
+    provider: 'kakuyomu,syosetu,novelup,hameln,pixiv,alphapolis',
+    type: 0,
+    level: whoami.value.hasNsfwAccess ? 0 : 1,
+    translate: 0,
+    sort: parseFavoredListValueSort(
+      [
+        { label: '收藏时间', value: 'createAt' },
+        { label: '更新时间', value: 'update' },
+      ],
+      setting.value.favoriteCreateTimeFirst ? 0 : 1,
+    ),
   }),
 );
 
-const showControlPanel = ref(false);
+const doSearch = () => {
+  router.push({
+    path: `/favorite/web/${props.favoredId}`,
+    query: searchQuery.value
+      ? { query: searchQuery.value, page: 1 }
+      : { page: 1 },
+  });
+};
 
+const showControlPanel = ref(false);
 const novelListRef = useTemplateRef('novelList');
 </script>
 
@@ -85,11 +81,16 @@ const novelListRef = useTemplateRef('novelList');
       />
     </n-collapse-transition>
 
-    <ListFilter
-      :options="listOptions"
-      :value="listValue"
-      @update:value="onUpdateListValue(listOptions, $event)"
-    />
+    <n-input-group style="max-width: 400px; margin-bottom: 12px">
+      <n-input
+        v-model:value="searchQuery"
+        size="small"
+        placeholder="搜索收藏..."
+        :input-props="{ spellcheck: false }"
+        @keyup.enter="doSearch"
+      />
+      <n-button size="small" type="primary" @click="doSearch">搜索</n-button>
+    </n-input-group>
 
     <CPage
       :page="page"

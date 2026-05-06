@@ -19,32 +19,12 @@ const emit = defineEmits<{
 }>();
 
 const workflowStore = useTranslationWorkflowStore();
-const profile = computed({
-  get: () => workflowStore.state.profile,
-  set: (profile) => {
-    workflowStore.state.profile = profile;
-  },
-});
 
-const stageMeta: Record<WorkflowStage, { label: string; icon: Component }> = {
-  extract: { label: '提取', icon: FormatListBulletedOutlined },
-  translate: { label: '翻译', icon: TranslateOutlined },
-  proofread: { label: '校对', icon: FactCheckOutlined },
-  polish: { label: '润色', icon: AutoFixHighOutlined },
-};
-
-const enabledStages = computed(() =>
-  profile.value.stages.map((stage: WorkflowStage) => stageMeta[stage]),
-);
-
-const selectStage = (label: string) => {
-  const entry = Object.entries(stageMeta).find(
-    ([, meta]) => meta.label === label,
-  );
-  if (entry) {
-    emit('update:currentStage', entry[0] as WorkflowStage);
-  }
-};
+const stageTabs: { key: WorkflowStage; label: string; icon: Component }[] = [
+  { key: 'extract', label: '提取', icon: FormatListBulletedOutlined },
+  { key: 'translate', label: '翻译', icon: TranslateOutlined },
+  { key: 'proofread', label: '校润', icon: FactCheckOutlined },
+];
 </script>
 
 <template>
@@ -52,22 +32,23 @@ const selectStage = (label: string) => {
     <section class="workspace-hero">
       <div>
         <n-text depth="3">翻译工作台</n-text>
-        <h1>{{ stageMeta[currentStage].label }}</h1>
+        <h1>开始翻译</h1>
+        <p>选择提取、翻译或校润阶段，完成轻小说机翻全流程。</p>
       </div>
-      <n-flex :wrap="false" align="center" class="stage-rail">
-        <template v-for="(stage, index) in enabledStages" :key="stage.label">
-          <button
-            class="stage-node"
-            :class="{ active: stage.label === stageMeta[currentStage].label }"
-            @click="selectStage(stage.label)"
-          >
-            <n-icon :component="stage.icon" :size="18" />
-            <span>{{ stage.label }}</span>
-          </button>
-          <div v-if="index < enabledStages.length - 1" class="stage-line" />
-        </template>
-      </n-flex>
     </section>
+
+    <nav class="stage-tabs">
+      <button
+        v-for="tab in stageTabs"
+        :key="tab.key"
+        class="stage-tab"
+        :class="{ active: tab.key === currentStage }"
+        @click="emit('update:currentStage', tab.key)"
+      >
+        <n-icon :component="tab.icon" :size="20" />
+        <span>{{ tab.label }}</span>
+      </button>
+    </nav>
 
     <slot />
   </div>
@@ -77,14 +58,10 @@ const selectStage = (label: string) => {
 .translation-workspace {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .workspace-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
-  align-items: end;
   padding: 28px;
   border-radius: 18px;
   background: radial-gradient(
@@ -106,50 +83,46 @@ const selectStage = (label: string) => {
   letter-spacing: -0.04em;
 }
 
-.stage-rail {
-  min-width: 320px;
+.workspace-hero p {
+  max-width: 680px;
+  margin: 10px 0 0;
+  color: var(--n-text-color-2);
 }
 
-.stage-node {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-  white-space: nowrap;
-  padding: 8px 14px;
+.stage-tabs {
+  display: flex;
+  gap: 0;
   border: 1px solid var(--n-border-color);
-  border-radius: 10px;
+  border-radius: 12px;
+  overflow: hidden;
+  width: fit-content;
+}
+
+.stage-tab {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 24px;
+  border: none;
   background: transparent;
   color: var(--n-text-color-2);
   cursor: pointer;
   font-size: 14px;
   transition: all 0.15s;
+  border-right: 1px solid var(--n-border-color);
 }
 
-.stage-node:hover {
+.stage-tab:last-child {
+  border-right: none;
+}
+
+.stage-tab:hover {
   color: var(--n-text-color);
-  border-color: var(--n-text-color-3);
+  background: rgba(125, 125, 125, 0.06);
 }
 
-.stage-node.active {
-  color: var(--n-text-color);
-  border-color: var(--primary-color, #6366f1);
-  background: rgba(99, 102, 241, 0.1);
-}
-
-.stage-line {
-  width: 26px;
-  height: 1px;
-  background: var(--n-border-color);
-}
-
-@media (max-width: 980px) {
-  .workspace-hero {
-    grid-template-columns: 1fr;
-  }
-
-  .stage-rail {
-    min-width: 0;
-    overflow-x: auto;
-  }
+.stage-tab.active {
+  color: #fff;
+  background: var(--primary-color, #6366f1);
 }
 </style>

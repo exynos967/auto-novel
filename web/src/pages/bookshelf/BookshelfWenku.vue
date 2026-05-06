@@ -4,12 +4,8 @@ import { ChecklistOutlined } from '@vicons/material';
 import { useIsWideScreen } from '@/pages/util';
 import { WenkuNovelRepo } from '@/repos';
 import { useSettingStore } from '@/stores';
-import { onUpdateListValue, onUpdatePage } from '../list/option';
-import type { WenkuFavoredListValue } from './option';
-import {
-  getWenkuFavoredListOptions,
-  parseFavoredListValueSort,
-} from './option';
+import { onUpdatePage } from '../list/option';
+import { parseFavoredListValueSort } from './option';
 
 const props = defineProps<{
   page: number;
@@ -22,27 +18,21 @@ const isWideScreen = useIsWideScreen();
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
 
-const listOptions = getWenkuFavoredListOptions(
-  setting.value.favoriteCreateTimeFirst,
-);
-
-const listValue = computed(
-  () =>
-    <WenkuFavoredListValue>{
-      排序: props.selected[0] ?? 0,
-    },
-);
-
 const { data: novelPage, error } = WenkuNovelRepo.useWenkuNovelFavoredList(
   () => props.page,
   () => props.favoredId,
   () => ({
-    sort: parseFavoredListValueSort(listOptions.排序, listValue.value.排序),
+    sort: parseFavoredListValueSort(
+      [
+        { label: '收藏时间', value: 'createAt' },
+        { label: '更新时间', value: 'update' },
+      ],
+      setting.value.favoriteCreateTimeFirst ? 0 : 1,
+    ),
   }),
 );
 
 const showControlPanel = ref(false);
-
 const novelListRef = useTemplateRef('novelList');
 </script>
 
@@ -68,12 +58,6 @@ const novelListRef = useTemplateRef('novelList');
         @invert-selection="novelListRef?.invertSelection()"
       />
     </n-collapse-transition>
-
-    <ListFilter
-      :options="listOptions"
-      :value="listValue"
-      @update:value="onUpdateListValue(listOptions, $event)"
-    />
 
     <CPage
       :page="page"

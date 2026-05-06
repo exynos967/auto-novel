@@ -96,15 +96,6 @@ const router = createRouter({
         },
 
         {
-          path: '/read-history',
-          meta: { title: '阅读历史' },
-          component: () => import('./pages/list/ReadHistoryList.vue'),
-          props: (route) => ({
-            page: Number(route.query.page) || 1,
-          }),
-        },
-
-        {
           path: '/novel',
           meta: { title: '网络小说' },
           component: () => import('./pages/list/WebNovelList.vue'),
@@ -240,6 +231,12 @@ const router = createRouter({
           meta: { title: '润色提示词' },
           component: () =>
             import('./pages/workspace/prompts/PolishPromptPage.vue'),
+        },
+        {
+          path: '/workspace/prompts/presets',
+          meta: { title: '预设管理' },
+          component: () =>
+            import('./pages/workspace/prompts/PresetManager.vue'),
         },
         // 兼容旧路由
         { path: '/workspace/toolbox', redirect: '/workspace/tables/glossary' },

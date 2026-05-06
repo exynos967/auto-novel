@@ -3,8 +3,9 @@ import { PlusOutlined } from '@vicons/material';
 
 import { WenkuNovelRepo } from '@/repos';
 import { FavoredRepo, useWhoamiStore } from '@/stores';
-import type { WenkuListValue } from './option';
-import { getWenkuListOptions, onUpdateListValue, onUpdatePage } from './option';
+import { onUpdatePage } from './option';
+
+const router = useRouter();
 
 const props = defineProps<{
   page: number;
@@ -18,23 +19,24 @@ const { whoami } = storeToRefs(whoamiStore);
 const favoredStore = FavoredRepo.useFavoredStore();
 const { favoreds } = storeToRefs(favoredStore);
 
-const listOptions = getWenkuListOptions(whoami.value.hasNsfwAccess);
-
-const listValue = computed(
-  () =>
-    <WenkuListValue>{
-      搜索: props.query,
-      分级: props.selected[0] ?? 0,
-    },
-);
+const searchQuery = ref(props.query);
 
 const { data: novelPage, error } = WenkuNovelRepo.useWenkuNovelList(
   () => props.page,
   () => ({
-    query: listValue.value.搜索,
-    level: listValue.value.分级,
+    query: props.query,
+    level: 0,
   }),
 );
+
+const doSearch = () => {
+  router.push({
+    path: '/wenku',
+    query: searchQuery.value
+      ? { query: searchQuery.value, page: 1 }
+      : { page: 1 },
+  });
+};
 
 watch(novelPage, (novelPage) => {
   if (novelPage) {
@@ -52,19 +54,22 @@ watch(novelPage, (novelPage) => {
   <div class="layout-content">
     <n-h1>文库小说</n-h1>
 
-    <router-link v-if="whoami.hasNovelAccess" to="/wenku-edit">
-      <c-button
-        label="新建小说"
-        :icon="PlusOutlined"
-        style="margin-bottom: 8px"
-      />
-    </router-link>
+    <n-flex align="center" style="margin-bottom: 16px">
+      <n-input-group style="max-width: 500px">
+        <n-input
+          v-model:value="searchQuery"
+          size="small"
+          placeholder="搜索中/日标题或作者..."
+          :input-props="{ spellcheck: false }"
+          @keyup.enter="doSearch"
+        />
+        <n-button size="small" type="primary" @click="doSearch">搜索</n-button>
+      </n-input-group>
 
-    <ListFilter
-      :options="listOptions"
-      :value="listValue"
-      @update:value="onUpdateListValue(listOptions, $event)"
-    />
+      <router-link v-if="whoami.hasNovelAccess" to="/wenku-edit">
+        <c-button label="新建小说" :icon="PlusOutlined" size="small" />
+      </router-link>
+    </n-flex>
 
     <CPage
       :page="page"
