@@ -4,7 +4,11 @@ import { VueDraggable } from 'vue-draggable-plus';
 
 import { TranslationCacheRepo } from '@/repos';
 import WorkspaceShell from './translation/WorkspaceShell.vue';
+import StartupView from './StartupView.vue';
+import ExtractStage from './ExtractStage.vue';
+import ProofreadStage from './ProofreadStage.vue';
 import type { GptWorker, SakuraWorker, TranslateJob } from '@/model/Translator';
+import type { WorkflowStage } from '@/domain/translate/workflow';
 import { doAction } from '@/pages/util';
 import {
   useGptWorkspaceStore,
@@ -16,6 +20,18 @@ const message = useMessage();
 
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
+
+const projectLoaded = ref(false);
+const activeStage = ref<WorkflowStage>('translate');
+
+const onProjectLoaded = () => {
+  projectLoaded.value = true;
+  activeStage.value = 'translate';
+};
+
+const onBackToStartup = () => {
+  projectLoaded.value = false;
+};
 
 type ProcessedJob = TranslateJob & {
   progress?: { finished: number; error: number; total: number };
@@ -130,104 +146,210 @@ const clearCache = async () =>
 
 <template>
   <div class="layout-content">
-    <workspace-shell :provider="activeProvider">
-      <template #workers>
-        <n-flex vertical size="small">
-          <c-action-wrapper title="提供商">
-            <c-radio-group
-              v-model:value="activeProvider"
-              :options="[
-                { label: 'LLM', value: 'gpt' },
-                { label: 'Sakura', value: 'sakura' },
-              ]"
-              size="small"
-            />
-          </c-action-wrapper>
-          <c-button-confirm
-            hint="真的要清空缓存吗？"
-            label="清空缓存"
-            :icon="DeleteOutlineOutlined"
-            size="small"
-            @action="clearCache"
-          />
-          <n-empty
-            v-if="workspaceRef.workers.length === 0"
-            description="没有翻译器，请先到设置里添加翻译器"
-          />
-          <n-list v-else>
-            <vue-draggable
-              v-model="workspaceRef.workers"
-              :animation="150"
-              handle=".drag-trigger"
+    <startup-view v-if="!projectLoaded" @loaded="onProjectLoaded" />
+
+    <workspace-shell
+      v-else
+      :current-stage="activeStage"
+      @update:current-stage="activeStage = $event"
+    >
+      <extract-stage v-if="activeStage === 'extract'" />
+
+      <div v-else-if="activeStage === 'translate'" class="workspace-grid">
+        <main class="workspace-main">
+          <section class="workspace-panel">
+            <div class="panel-heading">
+              <div>
+                <n-text depth="3">Task</n-text>
+                <h2>翻译任务</h2>
+              </div>
+            </div>
+            <n-flex
+              justify="space-between"
+              align="center"
+              style="margin-bottom: 12px"
             >
-              <n-list-item
-                v-for="worker of workspaceRef.workers"
-                :key="worker.id"
-              >
-                <job-worker
-                  :worker="toWorkspaceWorker(worker)"
-                  :get-next-job="getNextJob"
-                  :job-version="queuedJobVersion"
-                  :auto-start="shouldAutoStart(worker)"
-                  @update:progress="onProgressUpdated"
+              <n-text depth="3">
+                {{ workspaceRef.jobs.length }} 个等待任务
+              </n-text>
+              <n-flex :size="8">
+                <c-button
+                  label="本地书架"
+                  :icon="BookOutlined"
+                  size="small"
+                  @action="showLocalVolumeDrawer = true"
                 />
-              </n-list-item>
-            </vue-draggable>
-          </n-list>
-        </n-flex>
-      </template>
+                <c-button-confirm
+                  hint="真的要清空队列吗？"
+                  label="清空队列"
+                  :icon="DeleteOutlineOutlined"
+                  size="small"
+                  @action="deleteAllJobs"
+                />
+              </n-flex>
+            </n-flex>
+            <n-empty
+              v-if="workspaceRef.jobs.length === 0"
+              description="没有任务"
+            />
+            <n-list v-else>
+              <vue-draggable
+                v-model="workspaceRef.jobs"
+                :animation="150"
+                handle=".drag-trigger"
+              >
+                <n-list-item v-for="job of workspaceRef.jobs" :key="job.task">
+                  <job-queue
+                    :job="job"
+                    :progress="processedJobs.get(job.task)?.progress"
+                    @top-job="topJob(job)"
+                    @bottom-job="bottomJob(job)"
+                    @delete-job="deleteJob(job.task)"
+                  />
+                </n-list-item>
+              </vue-draggable>
+            </n-list>
+          </section>
 
-      <template #tasks>
-        <n-flex
-          justify="space-between"
-          align="center"
-          style="margin-bottom: 12px"
-        >
-          <n-text depth="3">{{ workspaceRef.jobs.length }} 个等待任务</n-text>
-          <n-flex :size="8">
-            <c-button
-              label="本地书架"
-              :icon="BookOutlined"
-              size="small"
-              @action="showLocalVolumeDrawer = true"
-            />
-            <c-button-confirm
-              hint="真的要清空队列吗？"
-              label="清空队列"
-              :icon="DeleteOutlineOutlined"
-              size="small"
-              @action="deleteAllJobs"
-            />
-          </n-flex>
-        </n-flex>
-        <n-empty v-if="workspaceRef.jobs.length === 0" description="没有任务" />
-        <n-list v-else>
-          <vue-draggable
-            v-model="workspaceRef.jobs"
-            :animation="150"
-            handle=".drag-trigger"
-          >
-            <n-list-item v-for="job of workspaceRef.jobs" :key="job.task">
-              <job-queue
-                :job="job"
-                :progress="processedJobs.get(job.task)?.progress"
-                @top-job="topJob(job)"
-                @bottom-job="bottomJob(job)"
-                @delete-job="deleteJob(job.task)"
+          <section class="workspace-panel">
+            <div class="panel-heading">
+              <div>
+                <n-text depth="3">History</n-text>
+                <h2>任务记录</h2>
+              </div>
+            </div>
+            <job-record-section :id="activeProvider" />
+          </section>
+        </main>
+
+        <aside class="workspace-aside">
+          <section class="workspace-panel compact">
+            <div class="panel-heading">
+              <div>
+                <n-text depth="3">Engine</n-text>
+                <h2>翻译器</h2>
+              </div>
+            </div>
+            <n-flex vertical size="small">
+              <c-action-wrapper title="提供商">
+                <c-radio-group
+                  v-model:value="activeProvider"
+                  :options="[
+                    { label: 'LLM', value: 'gpt' },
+                    { label: 'Sakura', value: 'sakura' },
+                  ]"
+                  size="small"
+                />
+              </c-action-wrapper>
+              <c-button-confirm
+                hint="真的要清空缓存吗？"
+                label="清空缓存"
+                :icon="DeleteOutlineOutlined"
+                size="small"
+                @action="clearCache"
               />
-            </n-list-item>
-          </vue-draggable>
-        </n-list>
-      </template>
+              <n-empty
+                v-if="workspaceRef.workers.length === 0"
+                description="没有翻译器，请先到设置里添加翻译器"
+              />
+              <n-list v-else>
+                <vue-draggable
+                  v-model="workspaceRef.workers"
+                  :animation="150"
+                  handle=".drag-trigger"
+                >
+                  <n-list-item
+                    v-for="worker of workspaceRef.workers"
+                    :key="worker.id"
+                  >
+                    <job-worker
+                      :worker="toWorkspaceWorker(worker)"
+                      :get-next-job="getNextJob"
+                      :job-version="queuedJobVersion"
+                      :auto-start="shouldAutoStart(worker)"
+                      @update:progress="onProgressUpdated"
+                    />
+                  </n-list-item>
+                </vue-draggable>
+              </n-list>
+            </n-flex>
+          </section>
 
-      <template #records>
-        <job-record-section :id="activeProvider" />
-      </template>
+          <section class="workspace-panel compact">
+            <div class="panel-heading">
+              <div>
+                <n-text depth="3">Config</n-text>
+                <h2>配置入口</h2>
+              </div>
+            </div>
+            <n-flex vertical size="small">
+              <n-flex>
+                <c-button
+                  label="任务设置"
+                  size="small"
+                  @action="$router.push('/workspace/task-settings')"
+                />
+                <c-button
+                  label="术语表"
+                  size="small"
+                  @action="$router.push('/workspace/tables/glossary')"
+                />
+              </n-flex>
+            </n-flex>
+          </section>
+        </aside>
+      </div>
+
+      <proofread-stage v-else-if="activeStage === 'proofread'" />
     </workspace-shell>
-  </div>
 
-  <local-volume-list-specific-translation
-    v-model:show="showLocalVolumeDrawer"
-    :type="activeProvider"
-  />
+    <local-volume-list-specific-translation
+      v-model:show="showLocalVolumeDrawer"
+      :type="activeProvider"
+    />
+  </div>
 </template>
+
+<style scoped>
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 20px;
+  align-items: start;
+}
+
+.workspace-main,
+.workspace-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.workspace-panel {
+  padding: 20px;
+  border: 1px solid var(--n-border-color);
+  border-radius: 16px;
+}
+
+.workspace-panel.compact {
+  padding: 18px;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panel-heading h2 {
+  margin: 0;
+}
+
+@media (max-width: 980px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
