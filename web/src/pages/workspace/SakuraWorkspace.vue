@@ -2,8 +2,8 @@
 import { BookOutlined, DeleteOutlineOutlined } from '@vicons/material';
 import { VueDraggable } from 'vue-draggable-plus';
 
-import { SakuraTranslator } from '@/domain/translate';
 import { TranslationCacheRepo } from '@/repos';
+import WorkspaceShell from './translation/WorkspaceShell.vue';
 import type { SakuraWorker, TranslateJob } from '@/model/Translator';
 import { doAction } from '@/pages/util';
 import { useSakuraWorkspaceStore, useSettingStore } from '@/stores';
@@ -91,118 +91,90 @@ const clearCache = async () =>
 
 <template>
   <div class="layout-content">
-    <n-h1>Sakura工作区</n-h1>
-
-    <bulletin>
-      <n-flex>
-        <span>
-          AutoDL:
-          <n-a
-            href="https://www.autodl.com/console/instance/list"
-            target="_blank"
-          >
-            控制台
-          </n-a>
-        </span>
-        /
-        <n-a
-          href="https://monitor.novelia.cc/public-dashboards/be71c46fcc0e40eeaf06d9e7a2e26f95?refresh=auto&from=now-5m&to=now&timezone=browser"
-          target="_blank"
-        >
-          共享 Sakura 当前负载
-        </n-a>
-      </n-flex>
-
-      <n-p>允许上传的模型如下，禁止一切试图突破上传检查的操作。</n-p>
-      <n-ul>
-        <n-li
-          v-for="({ repo }, model) in SakuraTranslator.allowModels"
-          :key="model"
-        >
-          [
-          <n-a
-            target="_blank"
-            :href="`https://huggingface.co/${repo}/blob/main/${model}.gguf`"
-          >
-            HF
-          </n-a>
-          /
-          <n-a
-            target="_blank"
-            :href="`https://hf-mirror.com/${repo}/blob/main/${model}.gguf`"
-          >
-            国内镜像
-          </n-a>
-          ]
-          {{ model }}
-        </n-li>
-      </n-ul>
-    </bulletin>
-
-    <section-header title="翻译器">
-      <c-button-confirm
-        hint="真的要清空缓存吗？"
-        label="清空缓存"
-        :icon="DeleteOutlineOutlined"
-        @action="clearCache"
-      />
-    </section-header>
-
-    <n-empty
-      v-if="workspaceRef.workers.length === 0"
-      description="没有翻译器"
-    />
-    <n-list>
-      <vue-draggable
-        v-model="workspaceRef.workers"
-        :animation="150"
-        handle=".drag-trigger"
-      >
-        <n-list-item v-for="worker of workspaceRef.workers" :key="worker.id">
-          <job-worker
-            :worker="{ translatorId: 'sakura', ...worker }"
-            :get-next-job="getNextJob"
-            :job-version="queuedJobVersion"
-            :auto-start="shouldAutoStart(worker)"
-            @update:progress="onProgressUpdated"
+    <workspace-shell provider="sakura">
+      <template #workers>
+        <n-flex vertical size="small">
+          <c-button-confirm
+            hint="真的要清空缓存吗？"
+            label="清空缓存"
+            :icon="DeleteOutlineOutlined"
+            size="small"
+            @action="clearCache"
           />
-        </n-list-item>
-      </vue-draggable>
-    </n-list>
-
-    <section-header title="任务队列">
-      <c-button
-        label="本地书架"
-        :icon="BookOutlined"
-        @action="showLocalVolumeDrawer = true"
-      />
-      <c-button-confirm
-        hint="真的要清空队列吗？"
-        label="清空队列"
-        :icon="DeleteOutlineOutlined"
-        @action="deleteAllJobs"
-      />
-    </section-header>
-    <n-empty v-if="workspaceRef.jobs.length === 0" description="没有任务" />
-    <n-list>
-      <vue-draggable
-        v-model="workspaceRef.jobs"
-        :animation="150"
-        handle=".drag-trigger"
-      >
-        <n-list-item v-for="job of workspaceRef.jobs" :key="job.task">
-          <job-queue
-            :job="job"
-            :progress="processedJobs.get(job.task)?.progress"
-            @top-job="workspace.topJob(job)"
-            @bottom-job="workspace.bottomJob(job)"
-            @delete-job="deleteJob(job.task)"
+          <n-empty
+            v-if="workspaceRef.workers.length === 0"
+            description="没有翻译器，请先到设置里添加 Sakura 翻译器"
           />
-        </n-list-item>
-      </vue-draggable>
-    </n-list>
+          <n-list v-else>
+            <vue-draggable
+              v-model="workspaceRef.workers"
+              :animation="150"
+              handle=".drag-trigger"
+            >
+              <n-list-item
+                v-for="worker of workspaceRef.workers"
+                :key="worker.id"
+              >
+                <job-worker
+                  :worker="{ translatorId: 'sakura', ...worker }"
+                  :get-next-job="getNextJob"
+                  :job-version="queuedJobVersion"
+                  :auto-start="shouldAutoStart(worker)"
+                  @update:progress="onProgressUpdated"
+                />
+              </n-list-item>
+            </vue-draggable>
+          </n-list>
+        </n-flex>
+      </template>
 
-    <job-record-section id="sakura" />
+      <template #tasks>
+        <n-flex
+          justify="space-between"
+          align="center"
+          style="margin-bottom: 12px"
+        >
+          <n-text depth="3">{{ workspaceRef.jobs.length }} 个等待任务</n-text>
+          <n-flex :size="8">
+            <c-button
+              label="本地书架"
+              :icon="BookOutlined"
+              size="small"
+              @action="showLocalVolumeDrawer = true"
+            />
+            <c-button-confirm
+              hint="真的要清空队列吗？"
+              label="清空队列"
+              :icon="DeleteOutlineOutlined"
+              size="small"
+              @action="deleteAllJobs"
+            />
+          </n-flex>
+        </n-flex>
+        <n-empty v-if="workspaceRef.jobs.length === 0" description="没有任务" />
+        <n-list v-else>
+          <vue-draggable
+            v-model="workspaceRef.jobs"
+            :animation="150"
+            handle=".drag-trigger"
+          >
+            <n-list-item v-for="job of workspaceRef.jobs" :key="job.task">
+              <job-queue
+                :job="job"
+                :progress="processedJobs.get(job.task)?.progress"
+                @top-job="workspace.topJob(job)"
+                @bottom-job="workspace.bottomJob(job)"
+                @delete-job="deleteJob(job.task)"
+              />
+            </n-list-item>
+          </vue-draggable>
+        </n-list>
+      </template>
+
+      <template #records>
+        <job-record-section id="sakura" />
+      </template>
+    </workspace-shell>
   </div>
 
   <local-volume-list-specific-translation

@@ -1,119 +1,132 @@
 <script lang="ts" setup>
-import { DeleteOutlineOutlined, PlusOutlined } from '@vicons/material';
-import type { UploadCustomRequestOptions } from 'naive-ui';
+import {
+  AutoFixHighOutlined,
+  BlockOutlined,
+  FindInPageOutlined,
+  ImportExportOutlined,
+  RuleFolderOutlined,
+  SpellcheckOutlined,
+} from '@vicons/material';
 
-import { useLocalVolumeStore } from '@/stores';
-import type { ParsedFile } from '@/util/file';
-import { parseFile } from '@/util/file';
-
-const message = useMessage();
-
-const files = shallowRef<ParsedFile[]>([]);
-
-const loadFile = async (file: File) => {
-  if (files.value.find((it) => it.name === file.name) !== undefined) {
-    message.warning('文件已经载入');
-    return;
-  }
-  try {
-    const toolboxFile = await parseFile(file, ['txt', 'epub']);
-    files.value.push(toolboxFile);
-    files.value = [...files.value];
-    triggerRef(files);
-  } catch (e) {
-    message.warning(`${e}`);
-  }
-};
-
-const removeFile = (name: string) => {
-  files.value = files.value.filter((it) => !(it.name === name));
-  triggerRef(files);
-};
-
-const clearFile = () => {
-  files.value = [];
-  triggerRef(files);
-};
-
-const loadLocalFile = (volumeId: string) =>
-  useLocalVolumeStore()
-    .then((repo) => repo.getFile(volumeId))
-    .then((file) => {
-      if (file === undefined) throw '小说不存在';
-      return loadFile(file.file);
-    })
-    .catch((error) => message.error(`文件载入失败：${error}`));
-
-const customRequest = ({
-  file,
-  onFinish,
-  onError,
-}: UploadCustomRequestOptions) => {
-  if (!file.file) return;
-  loadFile(file.file)
-    .then(onFinish)
-    .catch((err) => {
-      message.error('文件载入失败:' + err);
-      onError();
-    });
-};
-
-const showListModal = ref(false);
+const modules = [
+  {
+    title: '术语表',
+    description: '维护原文、译文和备注，翻译时自动筛选当前分段命中的条目。',
+    icon: SpellcheckOutlined,
+  },
+  {
+    title: '禁翻表',
+    description: '记录不允许出现在译文中的词，并参与工作流校验。',
+    icon: BlockOutlined,
+  },
+  {
+    title: '文本替换',
+    description: '支持译前清洗和译后替换，用来处理固定符号、称呼和格式。',
+    icon: ImportExportOutlined,
+  },
+  {
+    title: '文本提取',
+    description: '统一采用 AiNiee 的文件提取思路，收拢本地小说导入流程。',
+    icon: FindInPageOutlined,
+  },
+  {
+    title: '校对规则',
+    description: '管理行数、空译文、残留原文和禁翻词检查。',
+    icon: RuleFolderOutlined,
+  },
+  {
+    title: '润色提示词',
+    description: '管理校润工作流的独立 prompt，不再混在普通翻译器配置里。',
+    icon: AutoFixHighOutlined,
+  },
+];
 </script>
 
 <template>
-  <div class="layout-content">
-    <n-h1>小说工具箱</n-h1>
+  <div class="layout-content toolbox-page">
+    <section class="toolbox-hero">
+      <n-text depth="3">Prompt / Table / Rule</n-text>
+      <h1>提示词与公共表格</h1>
+      <p>
+        这里集中管理 AiNiee
+        风格的术语表、禁翻表、文本替换、提取和校润规则，并统一服务翻译工作流。
+      </p>
+    </section>
 
-    <n-flex>
-      <div>
-        <n-upload
-          :show-file-list="false"
-          accept=".txt,.epub"
-          multiple
-          directory-dnd
-          :custom-request="customRequest"
-        >
-          <c-button label="加载文件" :icon="PlusOutlined" />
-        </n-upload>
-      </div>
-
-      <c-button
-        label="本地书架"
-        :icon="PlusOutlined"
-        @action="showListModal = true"
-      />
-      <c-button
-        label="清空"
-        :icon="DeleteOutlineOutlined"
-        @action="clearFile"
-      />
-    </n-flex>
-
-    <n-flex vertical style="margin-top: 16px">
-      <n-text v-for="file of files" :key="file.name">
-        <toolbox-file-card :file="file" @delete="removeFile(file.name)" />
-      </n-text>
-    </n-flex>
-
-    <n-tabs type="segment" animated style="margin-top: 48px">
-      <n-tab-pane name="0" tab="术语表">
-        <toolbox-item-glossary :files="files" />
-      </n-tab-pane>
-      <n-tab-pane name="1" tab="EPUB：压缩图片">
-        <toolbox-item-compress-image :files="files" />
-      </n-tab-pane>
-      <n-tab-pane name="2" tab="TXT：修复OCR换行">
-        <toolbox-item-fix-ocr :files="files" />
-      </n-tab-pane>
-      <n-tab-pane name="3" tab="EPUB：转换成TXT">
-        <toolbox-item-convert v-model:files="files" />
-      </n-tab-pane>
-    </n-tabs>
-
-    <local-volume-list-katakana
-      v-model:show="showListModal"
-      @volume-loaded="loadLocalFile"
-    />
+    <div class="toolbox-grid">
+      <section v-for="item in modules" :key="item.title" class="toolbox-item">
+        <n-icon :component="item.icon" :size="24" />
+        <div>
+          <h2>{{ item.title }}</h2>
+          <p>{{ item.description }}</p>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.toolbox-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.toolbox-hero {
+  padding: 28px;
+  border-radius: 18px;
+  background: radial-gradient(
+      circle at top left,
+      rgba(16, 185, 129, 0.16),
+      transparent 30%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(125, 125, 125, 0.12),
+      rgba(125, 125, 125, 0.04)
+    );
+}
+
+.toolbox-hero h1,
+.toolbox-item h2 {
+  margin: 0;
+}
+
+.toolbox-hero h1 {
+  margin-top: 4px;
+  font-size: 32px;
+  letter-spacing: -0.04em;
+}
+
+.toolbox-hero p {
+  max-width: 760px;
+  margin: 10px 0 0;
+  color: var(--n-text-color-2);
+}
+
+.toolbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.toolbox-item {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--n-border-color);
+  border-radius: 16px;
+}
+
+.toolbox-item p {
+  margin: 6px 0 0;
+  color: var(--n-text-color-2);
+}
+
+@media (max-width: 760px) {
+  .toolbox-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

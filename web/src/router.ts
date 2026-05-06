@@ -172,16 +172,16 @@ const router = createRouter({
 
         {
           path: '/workspace',
-          redirect: '/workspace/sakura',
+          redirect: '/workspace/gpt',
           children: [
             {
               path: 'gpt',
-              meta: { title: 'LLM工作区' },
+              meta: { title: 'LLM工作流' },
               component: () => import('./pages/workspace/GptWorkspace.vue'),
             },
             {
               path: 'sakura',
-              meta: { title: 'Sakura工作区' },
+              meta: { title: 'Sakura工作流' },
               component: () => import('./pages/workspace/SakuraWorkspace.vue'),
             },
             {

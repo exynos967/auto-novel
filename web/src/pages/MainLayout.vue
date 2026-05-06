@@ -1,15 +1,19 @@
 <script lang="ts" setup>
 import {
   BookOutlined,
+  BuildOutlined,
   CandlestickChartOutlined,
   DarkModeOutlined,
   HistoryOutlined,
   HomeOutlined,
   LanguageOutlined,
+  ListAltOutlined,
   LogOutOutlined,
   MenuOutlined,
+  RocketLaunchOutlined,
   SettingsOutlined,
   StarBorderOutlined,
+  TranslateOutlined,
   WbSunnyOutlined,
   WorkspacesOutlined,
 } from '@vicons/material';
@@ -96,21 +100,34 @@ const menuOptions = computed<MenuOption[]>(() => {
       props: { style: { marginTop: '16px', marginBottom: '16px' } },
     },
     {
-      label: '工作区',
+      label: '翻译工作流',
       icon: renderIcon(WorkspacesOutlined),
       key: '/workspace',
       children: [
         {
-          label: renderLabel('小说工具箱', '/workspace/toolbox'),
-          key: '/workspace/toolbox',
-        },
-        {
-          label: renderLabel('LLM工作区', '/workspace/gpt'),
+          label: renderLabel('开始翻译', '/workspace/gpt'),
+          icon: renderIcon(RocketLaunchOutlined),
           key: '/workspace/gpt',
         },
         {
-          label: renderLabel('Sakura工作区', '/workspace/sakura'),
+          label: renderLabel('任务设置', '/setting'),
+          icon: renderIcon(SettingsOutlined),
+          key: '/setting/workflow',
+        },
+        {
+          label: renderLabel('输出设置', '/setting'),
+          icon: renderIcon(BuildOutlined),
+          key: '/setting/output',
+        },
+        {
+          label: renderLabel('翻译设置', '/workspace/sakura'),
+          icon: renderIcon(TranslateOutlined),
           key: '/workspace/sakura',
+        },
+        {
+          label: renderLabel('术语表', '/workspace/toolbox'),
+          icon: renderIcon(ListAltOutlined),
+          key: '/workspace/toolbox',
         },
         {
           label: renderLabel('交互翻译', '/workspace/interactive'),
