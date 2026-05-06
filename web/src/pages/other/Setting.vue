@@ -124,10 +124,7 @@ const clearWenkuSearchHistory = () => {
 <template>
   <div class="layout-content setting-page">
     <header class="setting-header">
-      <div>
-        <n-text depth="3">Settings</n-text>
-        <n-h1>设置</n-h1>
-      </div>
+      <n-h1>设置</n-h1>
       <c-radio-group v-model:value="activeTab" :options="tabs" size="small" />
     </header>
 
