@@ -12,6 +12,20 @@ const message = useMessage();
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
 
+const autoTranslate = computed({
+  get: () => setting.value.autoTranslate,
+  set: (autoTranslate: boolean) => {
+    setting.value = { ...setting.value, autoTranslate };
+  },
+});
+
+const autoTranslateProvider = computed({
+  get: () => setting.value.autoTranslateProvider,
+  set: (autoTranslateProvider: 'gpt' | 'sakura') => {
+    setting.value = { ...setting.value, autoTranslateProvider };
+  },
+});
+
 const clearWebSearchHistory = () => {
   useWebSearchHistoryStore().clear();
   message.success('清空成功');
@@ -95,13 +109,13 @@ const clearWenkuSearchHistory = () => {
           <n-checkbox v-model:checked="setting.autoTopJobWhenAddTask">
             添加翻译任务时自动置顶
           </n-checkbox>
-          <n-checkbox v-model:checked="setting.autoTranslate">
+          <n-checkbox v-model:checked="autoTranslate">
             进入翻译工作流自动开始翻译
           </n-checkbox>
-          <n-flex v-if="setting.autoTranslate" align="center">
+          <n-flex v-if="autoTranslate" align="center">
             自动翻译提供商
             <c-radio-group
-              v-model:value="setting.autoTranslateProvider"
+              v-model:value="autoTranslateProvider"
               :options="Setting.autoTranslateProviderOptions"
               size="small"
             />

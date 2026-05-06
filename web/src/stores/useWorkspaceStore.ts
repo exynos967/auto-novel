@@ -36,7 +36,12 @@ const createWorkspaceStore = <W extends GptWorker | SakuraWorker>(
   );
 
   const addWorker = (worker: W) => {
-    ref.value.workers.push(worker);
+    ref.value.workers = [...ref.value.workers, worker];
+  };
+  const updateWorker = (oldId: string, worker: W) => {
+    ref.value.workers = ref.value.workers.map((it) =>
+      it.id === oldId ? worker : it,
+    );
   };
   const deleteWorker = (id: string) => {
     ref.value.workers = ref.value.workers.filter((w) => w.id !== id);
@@ -113,6 +118,7 @@ const createWorkspaceStore = <W extends GptWorker | SakuraWorker>(
     ref,
     //
     addWorker,
+    updateWorker,
     deleteWorker,
     //
     addJob,

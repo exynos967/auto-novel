@@ -29,7 +29,7 @@ const sakuraWorkspace = useSakuraWorkspaceStore();
 const activeProvider = computed<'gpt' | 'sakura'>({
   get: () => setting.value.autoTranslateProvider,
   set: (value) => {
-    setting.value.autoTranslateProvider = value;
+    setting.value = { ...setting.value, autoTranslateProvider: value };
     processedJobs.value.clear();
     queuedJobVersion.value += 1;
   },

@@ -89,10 +89,7 @@ const submit = async () => {
     workspace.addWorker(worker);
     emit('update:show', false);
   } else {
-    const index = workspaceRef.value.workers.findIndex(
-      ({ id }) => id === props.worker?.id,
-    );
-    workspaceRef.value.workers[index] = worker;
+    workspace.updateWorker(props.worker.id, worker);
     emit('update:show', false);
   }
 };
