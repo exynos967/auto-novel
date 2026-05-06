@@ -4,19 +4,30 @@ import {
   HistoryOutlined,
   PlayArrowOutlined,
 } from '@vicons/material';
+import { useTranslationWorkflowStore } from '@/stores';
 
 const emit = defineEmits<{
-  loaded: [];
+  loaded: [projectId: string];
 }>();
 
-const showLocalVolumeDrawer = ref(false);
-const activeProjectType = ref('auto');
+const workflowStore = useTranslationWorkflowStore();
+
+const activeProjectType = computed({
+  get: () => workflowStore.state.currentProjectType,
+  set: (v) => {
+    workflowStore.state.currentProjectType = v;
+  },
+});
+
+const lastProjectId = computed(() => workflowStore.state.currentProjectId);
 
 const projectTypes = [
   { label: '自动检测', value: 'auto' },
   { label: '轻小说（标准）', value: 'novel' },
   { label: '游戏文本', value: 'game' },
 ];
+
+const showLocalVolumeDrawer = ref(false);
 </script>
 
 <template>
@@ -59,7 +70,19 @@ const projectTypes = [
           <n-icon :component="HistoryOutlined" :size="20" />
           <span>项目历史</span>
         </div>
-        <n-empty description="暂无翻译历史，选择本地书架开始翻译吧" />
+        <template v-if="lastProjectId">
+          <n-flex vertical>
+            <n-text depth="2">上次翻译项目：{{ lastProjectId }}</n-text>
+            <c-button
+              label="继续翻译"
+              :icon="PlayArrowOutlined"
+              size="small"
+              type="primary"
+              @action="emit('loaded', lastProjectId)"
+            />
+          </n-flex>
+        </template>
+        <n-empty v-else description="暂无翻译历史，选择本地书架开始翻译吧" />
       </section>
     </div>
 
@@ -68,7 +91,7 @@ const projectTypes = [
       type="gpt"
       @update:show="
         showLocalVolumeDrawer = $event;
-        if (!$event) emit('loaded');
+        if (!$event) emit('loaded', workflowStore.state.currentProjectType);
       "
     />
   </div>

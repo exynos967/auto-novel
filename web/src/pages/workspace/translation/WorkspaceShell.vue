@@ -12,6 +12,7 @@ import { useTranslationWorkflowStore } from '@/stores';
 
 const props = defineProps<{
   currentStage: WorkflowStage;
+  currentProjectId?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -33,7 +34,14 @@ const stageTabs: { key: WorkflowStage; label: string; icon: Component }[] = [
       <div>
         <n-text depth="3">翻译工作台</n-text>
         <h1>开始翻译</h1>
-        <p>选择提取、翻译或校润阶段，完成轻小说机翻全流程。</p>
+        <p>
+          <template v-if="currentProjectId">
+            当前项目：{{ currentProjectId }}
+          </template>
+          <template v-else>
+            选择提取、翻译或校润阶段，完成轻小说机翻全流程。
+          </template>
+        </p>
       </div>
     </section>
 

@@ -7,7 +7,6 @@ import {
   DarkModeOutlined,
   HomeOutlined,
   ImportExportOutlined,
-  LanguageOutlined,
   ListAltOutlined,
   LogOutOutlined,
   MenuBookOutlined,
@@ -89,14 +88,19 @@ const menuOptions = computed<MenuOption[]>(() => {
           key: '/favorite',
         },
         {
-          label: renderLabel('网络小说', '/novel'),
-          icon: renderIcon(LanguageOutlined),
-          key: '/novel',
-        },
-        {
-          label: renderLabel('文库小说', '/wenku'),
-          icon: renderIcon(BookOutlined),
-          key: '/wenku',
+          label: '小说',
+          icon: renderIcon(MenuBookOutlined),
+          key: 'novel-group',
+          children: [
+            {
+              label: renderLabel('网络小说', '/novel'),
+              key: '/novel',
+            },
+            {
+              label: renderLabel('文库小说', '/wenku'),
+              key: '/wenku',
+            },
+          ],
         },
       ],
     },

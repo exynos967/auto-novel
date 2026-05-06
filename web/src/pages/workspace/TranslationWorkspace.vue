@@ -14,6 +14,7 @@ import {
   useGptWorkspaceStore,
   useSakuraWorkspaceStore,
   useSettingStore,
+  useTranslationWorkflowStore,
 } from '@/stores';
 
 const message = useMessage();
@@ -21,10 +22,13 @@ const message = useMessage();
 const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
 
+const workflowStore = useTranslationWorkflowStore();
+
 const projectLoaded = ref(false);
 const activeStage = ref<WorkflowStage>('translate');
 
-const onProjectLoaded = () => {
+const onProjectLoaded = (projectId: string) => {
+  workflowStore.state.currentProjectId = projectId;
   projectLoaded.value = true;
   activeStage.value = 'translate';
 };
@@ -42,6 +46,14 @@ const queuedJobVersion = ref(0);
 
 const gptWorkspace = useGptWorkspaceStore();
 const sakuraWorkspace = useSakuraWorkspaceStore();
+
+const currentProjectId = computed(() => {
+  if (workflowStore.state.currentProjectId) {
+    return workflowStore.state.currentProjectId;
+  }
+  const jobs = gptWorkspace.ref.value.jobs;
+  return jobs.length > 0 ? jobs[0].task : null;
+});
 const activeProvider = computed<'gpt' | 'sakura'>({
   get: () => setting.value.autoTranslateProvider,
   set: (value) => {
@@ -151,6 +163,7 @@ const clearCache = async () =>
     <workspace-shell
       v-else
       :current-stage="activeStage"
+      :current-project-id="currentProjectId"
       @update:current-stage="activeStage = $event"
     >
       <extract-stage v-if="activeStage === 'extract'" />

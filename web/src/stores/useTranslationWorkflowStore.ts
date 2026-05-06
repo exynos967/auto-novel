@@ -8,15 +8,23 @@ import { LSKey } from './key';
 
 export interface TranslationWorkflowState {
   profile: WorkflowProfile;
+  currentProjectId: string | null;
+  currentProjectType: 'auto' | 'novel' | 'game';
 }
 
 export namespace TranslationWorkflowState {
   export const defaultValue = (): TranslationWorkflowState => ({
     profile: defaultWorkflowProfile(),
+    currentProjectId: null,
+    currentProjectType: 'auto',
   });
 
   export const migrate = (state: TranslationWorkflowState) => {
     const defaults = defaultValue();
+    state.currentProjectId =
+      state.currentProjectId ?? defaults.currentProjectId;
+    state.currentProjectType =
+      state.currentProjectType ?? defaults.currentProjectType;
     const currentProfile = state.profile ?? defaults.profile;
     state.profile = {
       ...defaults.profile,
