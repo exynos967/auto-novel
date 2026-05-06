@@ -12,8 +12,6 @@ export interface LocalVolumeMetadata {
   createAt: number;
   toc: {
     chapterId: string;
-    baidu?: string;
-    youdao?: string;
     gpt?: string;
     sakura?: string;
   }[];
@@ -26,8 +24,6 @@ export interface LocalVolumeChapter {
   id: string;
   volumeId: string;
   paragraphs: string[];
-  baidu?: ChapterTranslation;
-  youdao?: ChapterTranslation;
   gpt?: ChapterTranslation;
   sakura?: ChapterTranslation;
 }

@@ -151,7 +151,7 @@ const createFileUrl = ({
   novelId: string;
   mode: 'jp' | 'zh' | 'zh-jp' | 'jp-zh';
   translationsMode: 'parallel' | 'priority';
-  translations: ('sakura' | 'baidu' | 'youdao' | 'gpt')[];
+  translations: TranslatorId[];
   type: 'epub' | 'txt';
   title: string;
 }) => {

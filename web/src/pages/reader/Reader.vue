@@ -255,7 +255,7 @@ onKeyDown(['ArrowRight'], (e) => {
   }
 });
 
-onKeyDown(['1', '2', '3', '4'], (e) => {
+onKeyDown(['1', '2'], (e) => {
   if (e.altKey || e.ctrlKey || e.shiftKey || e.metaKey) {
     return;
   }
@@ -263,7 +263,7 @@ onKeyDown(['1', '2', '3', '4'], (e) => {
     return;
   }
   const setting = readerSetting.value;
-  const translatorIds = <TranslatorId[]>['baidu', 'youdao', 'gpt', 'sakura'];
+  const translatorIds = <TranslatorId[]>['gpt', 'sakura'];
   const translatorId = translatorIds[parseInt(e.key, 10) - 1];
   if (setting.translationsMode === 'parallel') {
     if (setting.translations.includes(translatorId)) {

@@ -39,7 +39,7 @@ export interface Setting {
 export namespace Setting {
   export const defaultValue: Setting = {
     theme: 'system',
-    enabledTranslator: ['baidu', 'youdao', 'gpt', 'sakura'],
+    enabledTranslator: ['gpt', 'sakura'],
     tocSortReverse: false,
     //
     tocCollapseInNarrowScreen: true,
@@ -57,7 +57,7 @@ export namespace Setting {
     downloadFormat: {
       mode: 'zh-jp',
       translationsMode: 'priority',
-      translations: ['sakura', 'gpt', 'youdao', 'baidu'],
+      translations: ['sakura', 'gpt'],
       type: 'epub',
     },
     paginationMode: 'pagination',
@@ -78,7 +78,11 @@ export namespace Setting {
       delete setting.isDark;
     }
     if (setting.enabledTranslator === undefined) {
-      setting.enabledTranslator = ['baidu', 'youdao', 'gpt', 'sakura'];
+      setting.enabledTranslator = ['gpt', 'sakura'];
+    } else {
+      setting.enabledTranslator = setting.enabledTranslator.filter(
+        (it) => it === 'gpt' || it === 'sakura',
+      );
     }
     if (setting.autoTranslate === undefined) {
       setting.autoTranslate = false;
@@ -86,6 +90,10 @@ export namespace Setting {
     if (setting.autoTranslateProvider === undefined) {
       setting.autoTranslateProvider = 'sakura';
     }
+    setting.downloadFormat.translations =
+      setting.downloadFormat.translations.filter(
+        (it) => it === 'gpt' || it === 'sakura',
+      );
     if ((setting.downloadFormat.mode as string) === 'mix') {
       setting.downloadFormat.mode = 'zh-jp';
     } else if ((setting.downloadFormat.mode as string) === 'mix-reverse') {
@@ -167,7 +175,7 @@ export namespace ReaderSetting {
   export const defaultValue: ReaderSetting = {
     mode: 'zh-jp',
     translationsMode: 'priority',
-    translations: ['sakura', 'gpt', 'youdao', 'baidu'],
+    translations: ['sakura', 'gpt'],
     clickArea: 'default',
     speakLanguages: ['jp'],
     pageTurnMode: 'page',
@@ -199,6 +207,9 @@ export namespace ReaderSetting {
     } else if ((setting.mode as unknown) === 'mix-reverse') {
       setting.mode = 'jp-zh';
     }
+    setting.translations = setting.translations.filter(
+      (it) => it === 'gpt' || it === 'sakura',
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const theme = setting.theme as any;
     if (theme.isDark !== undefined) {

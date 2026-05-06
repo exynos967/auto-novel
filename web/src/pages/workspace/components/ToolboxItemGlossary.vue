@@ -97,26 +97,21 @@ const showSakuraSelectModal = ref(false);
 const selectedSakuraWorkerId = ref(sakuraWorkspace.value.workers[0]?.id);
 
 const katakanaTranslations = ref<{ [key: string]: string }>({});
-const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
+const translateKatakanas = async () => {
   const jpWords = [...katakanas.value.keys()];
-  let config: TranslatorConfig;
-  if (id === 'sakura') {
-    const worker = sakuraWorkspace.value.workers.find(
-      (it) => it.id === selectedSakuraWorkerId.value,
-    );
-    if (worker === undefined) {
-      message.error('未选择Sakura翻译器');
-      return;
-    }
-    config = {
-      id,
-      endpoint: worker.endpoint,
-      segLength: worker.segLength,
-      prevSegLength: worker.prevSegLength,
-    };
-  } else {
-    config = { id };
+  const worker = sakuraWorkspace.value.workers.find(
+    (it) => it.id === selectedSakuraWorkerId.value,
+  );
+  if (worker === undefined) {
+    message.error('未选择Sakura翻译器');
+    return;
   }
+  const config: TranslatorConfig = {
+    id: 'sakura',
+    endpoint: worker.endpoint,
+    segLength: worker.segLength,
+    prevSegLength: worker.prevSegLength,
+  };
   try {
     const translator = await Translator.create(config, false);
     const zhWords = await translator.translate(jpWords, {});
@@ -162,22 +157,9 @@ const translateKatakanas = async (id: 'baidu' | 'youdao' | 'sakura') => {
             @action="copyTranslationJson()"
           />
           <c-button
-            label="百度翻译"
-            :round="false"
-            @action="translateKatakanas('baidu')"
-          />
-          <c-button
-            label="有道翻译"
-            :round="false"
-            @action="translateKatakanas('youdao')"
-          />
-        </n-button-group>
-
-        <n-button-group size="small">
-          <c-button
             :label="`Sakura翻译-${selectedSakuraWorkerId ?? '未选中'}`"
             :round="false"
-            @action="translateKatakanas('sakura')"
+            @action="translateKatakanas()"
           />
           <c-button
             label="选择翻译器"

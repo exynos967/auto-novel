@@ -20,21 +20,12 @@ const props = defineProps<{
   titleZh?: string;
   total: number;
   jp: number;
-  baidu: number;
-  youdao: number;
   gpt: number;
   sakura: number;
   glossary: { [key: string]: string };
 }>();
 
 const { providerId, novelId, titleJp, titleZh, total } = props;
-
-const emit = defineEmits<{
-  'update:jp': [number];
-  'update:baidu': [number];
-  'update:youdao': [number];
-  'update:gpt': [number];
-}>();
 
 const message = useMessage();
 
@@ -45,13 +36,6 @@ const settingStore = useSettingStore();
 const { setting } = storeToRefs(settingStore);
 
 const translateOptions = useTemplateRef('translateOptions');
-const translateTask = useTemplateRef('translateTask');
-const startTranslateTask = (translatorId: 'baidu' | 'youdao') =>
-  translateTask?.value?.startTask(
-    { type: 'web', providerId, novelId },
-    translateOptions.value!.getTranslateTaskParams(),
-    { id: translatorId },
-  );
 
 const files = computed(() => {
   const title =
@@ -180,25 +164,10 @@ const submitWorkflowJob = () => {
   />
 
   <n-flex vertical style="margin-top: 16px">
-    <n-text>
-      总计 {{ total }} / 百度 {{ baidu }} / 有道 {{ youdao }} / LLM {{ gpt }} /
-      Sakura {{ sakura }}
-    </n-text>
+    <n-text>总计 {{ total }} / LLM {{ gpt }} / Sakura {{ sakura }}</n-text>
 
     <template v-if="whoami.isSignedIn && setting.enabledTranslator.length > 0">
       <n-button-group>
-        <c-button
-          v-if="setting.enabledTranslator.includes('baidu')"
-          label="更新百度"
-          :round="false"
-          @action="startTranslateTask('baidu')"
-        />
-        <c-button
-          v-if="setting.enabledTranslator.includes('youdao')"
-          label="更新有道"
-          :round="false"
-          @action="startTranslateTask('youdao')"
-        />
         <c-button
           v-if="
             setting.enabledTranslator.includes(setting.autoTranslateProvider)
@@ -240,13 +209,4 @@ const submitWorkflowJob = () => {
       />
     </n-button-group>
   </n-flex>
-
-  <TranslateTask
-    ref="translateTask"
-    @update:jp="(zh) => emit('update:jp', zh)"
-    @update:baidu="(zh) => emit('update:baidu', zh)"
-    @update:youdao="(zh) => emit('update:youdao', zh)"
-    @update:gpt="(zh) => emit('update:gpt', zh)"
-    style="margin-top: 20px"
-  />
 </template>

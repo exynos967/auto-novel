@@ -1,6 +1,6 @@
 import type { Glossary } from './Glossary';
 
-export type TranslatorId = 'sakura' | 'baidu' | 'youdao' | 'gpt';
+export type TranslatorId = 'sakura' | 'gpt';
 
 export interface GptWorker {
   id: string;

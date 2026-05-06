@@ -24,15 +24,6 @@ const { setting } = storeToRefs(settingStore);
 const whoamiStore = useWhoamiStore();
 const { whoami } = storeToRefs(whoamiStore);
 
-const translateTask = useTemplateRef('translateTask');
-const startTranslateTask = (translatorId: 'baidu' | 'youdao') => {
-  return translateTask?.value?.startTask(
-    { type: 'wenku', novelId, volumeId: volume.volumeId },
-    getParams(),
-    { id: translatorId },
-  );
-};
-
 const hasTranslation = computed(() => {
   const { translations } = setting.value.downloadFormat;
   return translations.some((t) => (volume[t] ?? 0) > 0);
@@ -82,26 +73,11 @@ const submitWorkflowJob = () => {
       <n-text>{{ volume.volumeId }}</n-text>
 
       <n-text depth="3">
-        总计 {{ volume.total }} / 百度 {{ volume.baidu }} / 有道
-        {{ volume.youdao }} / LLM {{ volume.gpt }} / Sakura {{ volume.sakura }}
+        总计 {{ volume.total }} / LLM {{ volume.gpt }} / Sakura
+        {{ volume.sakura }}
       </n-text>
 
       <n-flex :size="8">
-        <c-button
-          v-if="setting.enabledTranslator.includes('baidu')"
-          label="更新百度"
-          size="tiny"
-          secondary
-          @action="startTranslateTask('baidu')"
-        />
-        <c-button
-          v-if="setting.enabledTranslator.includes('youdao')"
-          label="更新有道"
-          size="tiny"
-          secondary
-          @action="startTranslateTask('youdao')"
-        />
-
         <c-button
           v-if="
             setting.enabledTranslator.includes(setting.autoTranslateProvider)
@@ -132,13 +108,4 @@ const submitWorkflowJob = () => {
       target="_blank"
     />
   </n-flex>
-
-  <TranslateTask
-    ref="translateTask"
-    @update:baidu="(zh) => (volume.baidu = zh)"
-    @update:youdao="(zh) => (volume.youdao = zh)"
-    @update:gpt="(zh) => (volume.gpt = zh)"
-    @update:sakura="(zh) => (volume.sakura = zh)"
-    style="margin-top: 20px"
-  />
 </template>

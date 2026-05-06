@@ -5,7 +5,6 @@ import { getProduct } from './ApiGetProduct';
 import { getSerial } from './ApiGetSerial';
 import { search } from './ApiSearch';
 import { extractAsin, prettyCover } from './Common';
-import { Translator } from '../translate';
 
 type Logger = (message: string) => void;
 
@@ -237,16 +236,6 @@ export const smartImport = async (
     );
     volumes = volumes.concat(volumesNew);
     novel.volumes = volumes;
-
-    try {
-      const translator = await Translator.create({ id: 'youdao' });
-      const titleZh = await translator.translatePlain(novel.title);
-      const introductionZh = await translator.translatePlain(
-        novel.introduction,
-      );
-      novel.titleZh = titleZh;
-      novel.introduction = introductionZh;
-    } catch {}
 
     populateNovel(novel);
   }

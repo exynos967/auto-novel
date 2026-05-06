@@ -131,8 +131,6 @@ private fun generateWriteInfoFromChapter(
 
     fun getTranslation(id: TranslatorId) =
         when (id) {
-            TranslatorId.Baidu -> chapter.baiduParagraphs
-            TranslatorId.Youdao -> chapter.youdaoParagraphs
             TranslatorId.Gpt -> chapter.gptParagraphs
             TranslatorId.Sakura -> chapter.sakuraParagraphs
         }.also {

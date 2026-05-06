@@ -11,8 +11,6 @@ import CTaskCard from './CTaskCard.vue';
 
 const emit = defineEmits<{
   'update:jp': [number];
-  'update:baidu': [number];
-  'update:youdao': [number];
   'update:gpt': [number];
   'update:sakura': [number];
 }>();
@@ -53,8 +51,6 @@ const startTask = async (
 
   const buildLabel = () => {
     const idToLaber = {
-      baidu: '百度',
-      youdao: '有道',
       gpt: 'LLM',
       sakura: 'Sakura',
     };
@@ -103,11 +99,7 @@ const startTask = async (
       onChapterSuccess: ({ jp, zh }) => {
         if (jp !== undefined) emit('update:jp', jp);
         if (zh !== undefined) {
-          if (translatorDesc.id === 'baidu') {
-            emit('update:baidu', zh);
-          } else if (translatorDesc.id === 'youdao') {
-            emit('update:youdao', zh);
-          } else if (translatorDesc.id === 'gpt') {
+          if (translatorDesc.id === 'gpt') {
             emit('update:gpt', zh);
           } else {
             emit('update:sakura', zh);

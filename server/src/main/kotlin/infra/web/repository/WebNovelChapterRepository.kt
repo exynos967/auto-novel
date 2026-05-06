@@ -37,8 +37,6 @@ class WebNovelChapterRepository(
         translatorId: TranslatorId,
     ): List<WebNovelChapterTranslationState> {
         val (glossaryUuidProperty, paragraphsZhProperty) = when (translatorId) {
-            TranslatorId.Baidu -> Pair(WebNovelChapter::baiduGlossaryUuid, WebNovelChapter::baiduParagraphs)
-            TranslatorId.Youdao -> Pair(WebNovelChapter::youdaoGlossaryUuid, WebNovelChapter::youdaoParagraphs)
             TranslatorId.Gpt -> Pair(WebNovelChapter::gptGlossaryUuid, WebNovelChapter::gptParagraphs)
             TranslatorId.Sakura -> Pair(WebNovelChapter::sakuraGlossaryUuid, WebNovelChapter::sakuraParagraphs)
         }
@@ -188,12 +186,6 @@ class WebNovelChapterRepository(
             WebNovelChapter.byId(providerId, novelId, chapterId),
             updated,
         )
-        if (local.baiduParagraphs != null) {
-            updateChapterTranslateState(providerId, novelId, TranslatorId.Baidu)
-        }
-        if (local.youdaoParagraphs != null) {
-            updateChapterTranslateState(providerId, novelId, TranslatorId.Youdao)
-        }
         if (local.gptParagraphs != null) {
             updateChapterTranslateState(providerId, novelId, TranslatorId.Gpt)
         }
@@ -213,18 +205,6 @@ class WebNovelChapterRepository(
         val glossaryUuid = glossary?.id ?: "no glossary"
         val glossaryContent = glossary?.map ?: emptyMap()
         val updateBson = when (translatorId) {
-            TranslatorId.Baidu -> combine(
-                set(WebNovelChapter::baiduGlossaryUuid.field(), glossaryUuid),
-                set(WebNovelChapter::baiduGlossary.field(), glossaryContent),
-                set(WebNovelChapter::baiduParagraphs.field(), paragraphsZh)
-            )
-
-            TranslatorId.Youdao -> combine(
-                set(WebNovelChapter::youdaoGlossaryUuid.field(), glossaryUuid),
-                set(WebNovelChapter::youdaoGlossary.field(), glossaryContent),
-                set(WebNovelChapter::youdaoParagraphs.field(), paragraphsZh)
-            )
-
             TranslatorId.Gpt -> combine(
                 set(WebNovelChapter::gptGlossaryUuid.field(), glossaryUuid),
                 set(WebNovelChapter::gptGlossary.field(), glossaryContent),
@@ -257,8 +237,6 @@ class WebNovelChapterRepository(
         translatorId: TranslatorId,
     ): Long {
         val zhProperty1 = when (translatorId) {
-            TranslatorId.Baidu -> WebNovelChapter::baiduParagraphs
-            TranslatorId.Youdao -> WebNovelChapter::youdaoParagraphs
             TranslatorId.Gpt -> WebNovelChapter::gptParagraphs
             TranslatorId.Sakura -> WebNovelChapter::sakuraParagraphs
         }
@@ -274,8 +252,6 @@ class WebNovelChapterRepository(
                 )
             )
         val zhProperty = when (translatorId) {
-            TranslatorId.Baidu -> WebNovel::baidu
-            TranslatorId.Youdao -> WebNovel::youdao
             TranslatorId.Gpt -> WebNovel::gpt
             TranslatorId.Sakura -> WebNovel::sakura
         }

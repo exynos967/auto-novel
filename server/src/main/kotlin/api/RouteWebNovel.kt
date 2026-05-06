@@ -491,8 +491,6 @@ class WebNovelApi(
         val favored: String?,
         val lastReadChapterId: String?,
         val jp: Long,
-        val baidu: Long,
-        val youdao: Long,
         val gpt: Long,
         val sakura: Long,
     )
@@ -520,8 +518,6 @@ class WebNovelApi(
             favored = null,
             lastReadChapterId = null,
             jp = novel.jp,
-            baidu = novel.baidu,
-            youdao = novel.youdao,
             gpt = novel.gpt,
             sakura = novel.sakura,
         )
@@ -652,8 +648,6 @@ class WebNovelApi(
         val prevId: String?,
         val nextId: String?,
         val paragraphs: List<String>,
-        val baiduParagraphs: List<String>?,
-        val youdaoParagraphs: List<String>?,
         val gptParagraphs: List<String>?,
         val sakuraParagraphs: List<String>?,
     )
@@ -680,8 +674,6 @@ class WebNovelApi(
             prevId = toc.getOrNull(currIndex - 1)?.chapterId,
             nextId = toc.getOrNull(currIndex + 1)?.chapterId,
             paragraphs = chapter.paragraphs,
-            baiduParagraphs = chapter.baiduParagraphs,
-            youdaoParagraphs = chapter.youdaoParagraphs,
             gptParagraphs = chapter.gptParagraphs,
             sakuraParagraphs = chapter.sakuraParagraphs,
         )
@@ -983,8 +975,6 @@ class WebNovelTranslateV2Api(
 
         val (oldGlossaryIdRaw, oldGlossary, oldTranslation) = chapter.run {
             when (translatorId) {
-                TranslatorId.Baidu -> Triple(baiduGlossaryUuid, baiduGlossary, baiduParagraphs)
-                TranslatorId.Youdao -> Triple(youdaoGlossaryUuid, youdaoGlossary, youdaoParagraphs)
                 TranslatorId.Gpt -> Triple(gptGlossaryUuid, gptGlossary, gptParagraphs)
                 TranslatorId.Sakura -> Triple(sakuraGlossaryUuid, sakuraGlossary, sakuraParagraphs)
             }

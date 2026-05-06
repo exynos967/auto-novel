@@ -424,8 +424,6 @@ fun WebNovel.toOutline(
         //
         total = toc.count { it.chapterId != null }.toLong(),
         jp = jp,
-        baidu = baidu,
-        youdao = youdao,
         gpt = gpt,
         sakura = sakura,
         extra = null,

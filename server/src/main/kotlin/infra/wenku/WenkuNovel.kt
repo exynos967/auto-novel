@@ -96,8 +96,6 @@ data class WenkuNovelVolumeList(
 data class WenkuNovelVolumeJp(
     val volumeId: String,
     val total: Int,
-    val baidu: Int,
-    val youdao: Int,
     val gpt: Int,
     val sakura: Int,
 )

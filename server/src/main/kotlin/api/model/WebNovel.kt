@@ -21,8 +21,6 @@ data class WebNovelOutlineDto(
     //
     val total: Long,
     val jp: Long,
-    val baidu: Long,
-    val youdao: Long,
     val gpt: Long,
     val sakura: Long,
     val updateAt: Long?,
@@ -42,10 +40,7 @@ fun WebNovelListItem.asDto() =
         lastReadAt = lastReadAt?.epochSeconds,
         total = total,
         jp = jp,
-        baidu = baidu,
-        youdao = youdao,
         gpt = gpt,
         sakura = sakura,
         updateAt = updateAt?.epochSeconds,
     )
-

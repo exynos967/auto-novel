@@ -45,7 +45,7 @@ const clearWenkuSearchHistory = () => {
           <n-ul>
             <n-li>列表页面，可以使用左右方向键翻页。</n-li>
             <n-li>阅读页面，可以使用左右方向键跳转上/下一章。</n-li>
-            <n-li>阅读页面，可以使用数字键1～4快速切换翻译。</n-li>
+            <n-li>阅读页面，可以使用数字键1～2快速切换翻译。</n-li>
           </n-ul>
         </n-flex>
       </n-list-item>

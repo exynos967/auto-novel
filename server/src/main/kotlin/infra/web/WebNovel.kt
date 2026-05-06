@@ -70,8 +70,6 @@ data class WebNovelListItem(
     //
     val total: Long = 0,
     val jp: Long = 0,
-    val baidu: Long = 0,
-    val youdao: Long = 0,
     val gpt: Long = 0,
     val sakura: Long,
     val extra: String? = null,
@@ -100,8 +98,6 @@ class WebNovel(
     val toc: List<WebNovelTocItem>,
     // Translate state
     val jp: Long = 0,
-    val baidu: Long = 0,
-    val youdao: Long = 0,
     val gpt: Long = 0,
     val sakura: Long = 0,
     // Misc
@@ -144,17 +140,6 @@ data class WebNovelChapter(
     val chapterId: String,
     @SerialName("paragraphsJp")
     val paragraphs: List<String>,
-
-    @SerialName("glossaryUuid")
-    val baiduGlossaryUuid: String? = null,
-    @SerialName("glossary")
-    val baiduGlossary: Map<String, String>? = emptyMap(),
-    @SerialName("paragraphsZh")
-    val baiduParagraphs: List<String>? = null,
-
-    val youdaoGlossaryUuid: String? = null,
-    val youdaoGlossary: Map<String, String>? = emptyMap(),
-    val youdaoParagraphs: List<String>? = null,
 
     val gptGlossaryUuid: String? = null,
     val gptGlossary: Map<String, String>? = emptyMap(),

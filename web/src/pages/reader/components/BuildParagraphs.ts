@@ -53,11 +53,7 @@ export const buildParagraphs = (
     const paragraphsWithLabel = (
       t: TranslatorId,
     ): [string, string[] | undefined] => {
-      if (t === 'youdao') {
-        return ['有道', chapter.youdaoParagraphs];
-      } else if (t === 'baidu') {
-        return ['百度', chapter.baiduParagraphs];
-      } else if (t === 'gpt') {
+      if (t === 'gpt') {
         return ['LLM', chapter.gptParagraphs];
       } else {
         return ['Sakura', chapter.sakuraParagraphs];
