@@ -27,9 +27,9 @@ defineProps<{
 
 const workflowStore = useTranslationWorkflowStore();
 const profile = computed({
-  get: () => workflowStore.state.value.profile,
+  get: () => workflowStore.state.profile,
   set: (profile) => {
-    workflowStore.state.value = { ...workflowStore.state.value, profile };
+    workflowStore.state.profile = profile;
   },
 });
 
@@ -97,7 +97,7 @@ const stageMeta: Record<WorkflowStage, { label: string; icon: Component }> = {
 };
 
 const enabledStages = computed(() =>
-  profile.value.stages.map((stage) => stageMeta[stage]),
+  profile.value.stages.map((stage: WorkflowStage) => stageMeta[stage]),
 );
 
 const addGlossaryTerm = () => {
@@ -111,15 +111,18 @@ const addGlossaryTerm = () => {
 
 const updateGlossaryTerm = (index: number, patch: Partial<TermEntry>) => {
   updateDictionary({
-    glossary: profile.value.dictionary.glossary.map((item, i) =>
-      i === index ? { ...item, ...patch } : item,
+    glossary: profile.value.dictionary.glossary.map(
+      (item: TermEntry, i: number) =>
+        i === index ? { ...item, ...patch } : item,
     ),
   });
 };
 
 const deleteGlossaryTerm = (index: number) => {
   updateDictionary({
-    glossary: profile.value.dictionary.glossary.filter((_, i) => i !== index),
+    glossary: profile.value.dictionary.glossary.filter(
+      (_: TermEntry, i: number) => i !== index,
+    ),
   });
 };
 
@@ -137,8 +140,9 @@ const updateForbiddenTerm = (
   patch: Partial<ForbiddenTermEntry>,
 ) => {
   updateDictionary({
-    forbiddenTerms: profile.value.dictionary.forbiddenTerms.map((item, i) =>
-      i === index ? { ...item, ...patch } : item,
+    forbiddenTerms: profile.value.dictionary.forbiddenTerms.map(
+      (item: ForbiddenTermEntry, i: number) =>
+        i === index ? { ...item, ...patch } : item,
     ),
   });
 };
@@ -146,7 +150,7 @@ const updateForbiddenTerm = (
 const deleteForbiddenTerm = (index: number) => {
   updateDictionary({
     forbiddenTerms: profile.value.dictionary.forbiddenTerms.filter(
-      (_, i) => i !== index,
+      (_: ForbiddenTermEntry, i: number) => i !== index,
     ),
   });
 };
@@ -165,8 +169,9 @@ const updateReplacement = (
   patch: Partial<TextReplacementEntry>,
 ) => {
   updateDictionary({
-    replacements: profile.value.dictionary.replacements.map((item, i) =>
-      i === index ? { ...item, ...patch } : item,
+    replacements: profile.value.dictionary.replacements.map(
+      (item: TextReplacementEntry, i: number) =>
+        i === index ? { ...item, ...patch } : item,
     ),
   });
 };
@@ -174,7 +179,7 @@ const updateReplacement = (
 const deleteReplacement = (index: number) => {
   updateDictionary({
     replacements: profile.value.dictionary.replacements.filter(
-      (_, i) => i !== index,
+      (_: TextReplacementEntry, i: number) => i !== index,
     ),
   });
 };

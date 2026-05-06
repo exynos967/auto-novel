@@ -34,7 +34,7 @@ const selectedGptWorkerId = ref(gptWorkspaceRef.value.workers[0]?.id);
 const sakuraWorkspaceRef = useSakuraWorkspaceStore().ref;
 const selectedSakuraWorkerId = ref(sakuraWorkspaceRef.value.workers[0]?.id);
 const workflowProfile = computed(
-  () => useTranslationWorkflowStore().state.value.profile,
+  () => useTranslationWorkflowStore().state.profile,
 );
 
 interface SavedTranslation {

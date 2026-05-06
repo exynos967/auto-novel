@@ -18,7 +18,7 @@ export const translate = async (
   translatorConfig: TranslatorConfig,
   signal?: AbortSignal,
 ) => {
-  const workflowProfile = useTranslationWorkflowStore().state.value.profile;
+  const workflowProfile = useTranslationWorkflowStore().state.profile;
   let translator: Translator;
   try {
     translator = await Translator.create(
