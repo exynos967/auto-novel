@@ -5,7 +5,6 @@ import { useIsWideScreen } from '@/pages/util';
 import { WenkuNovelRepo } from '@/repos';
 import { useSettingStore } from '@/stores';
 import { onUpdatePage } from '../list/option';
-import { parseFavoredListValueSort } from './option';
 
 const props = defineProps<{
   page: number;
@@ -22,13 +21,7 @@ const { data: novelPage, error } = WenkuNovelRepo.useWenkuNovelFavoredList(
   () => props.page,
   () => props.favoredId,
   () => ({
-    sort: parseFavoredListValueSort(
-      [
-        { label: '收藏时间', value: 'createAt' },
-        { label: '更新时间', value: 'update' },
-      ],
-      setting.value.favoriteCreateTimeFirst ? 0 : 1,
-    ),
+    sort: setting.value.favoriteCreateTimeFirst ? 'create' : 'update',
   }),
 );
 

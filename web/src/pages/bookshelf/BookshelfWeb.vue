@@ -5,7 +5,6 @@ import { useIsWideScreen } from '@/pages/util';
 import { WebNovelRepo } from '@/repos';
 import { useSettingStore, useWhoamiStore } from '@/stores';
 import { onUpdatePage } from '../list/option';
-import { parseFavoredListValueSort } from './option';
 
 const router = useRouter();
 
@@ -35,13 +34,7 @@ const { data: novelPage, error } = WebNovelRepo.useWebNovelFavoredList(
     type: 0,
     level: whoami.value.hasNsfwAccess ? 0 : 1,
     translate: 0,
-    sort: parseFavoredListValueSort(
-      [
-        { label: '收藏时间', value: 'createAt' },
-        { label: '更新时间', value: 'update' },
-      ],
-      setting.value.favoriteCreateTimeFirst ? 0 : 1,
-    ),
+    sort: setting.value.favoriteCreateTimeFirst ? 'create' : 'update',
   }),
 );
 
