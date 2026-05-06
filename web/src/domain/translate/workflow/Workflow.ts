@@ -27,6 +27,19 @@ export interface WorkflowDictionary {
   replacements: TextReplacementEntry[];
 }
 
+export interface WorkflowPrompts {
+  translation: {
+    system: string;
+    character: string;
+    world: string;
+    style: string;
+    example: string;
+  };
+  polish: {
+    system: string;
+  };
+}
+
 export interface WorkflowProfile {
   id: string;
   name: string;
@@ -34,6 +47,7 @@ export interface WorkflowProfile {
   targetLanguage: string;
   stages: WorkflowStage[];
   dictionary: WorkflowDictionary;
+  prompts: WorkflowPrompts;
   promptPreset: 'basic' | 'novel' | 'faithful';
   lineLimit: number;
   roundLimit: number;
@@ -62,7 +76,7 @@ export interface WorkflowPlan {
 
 export const defaultWorkflowProfile = (): WorkflowProfile => ({
   id: 'default-novel-translation',
-  name: '小说翻译工作流',
+  name: '小说翻译任务',
   sourceLanguage: '日语',
   targetLanguage: '简体中文',
   stages: ['extract', 'translate', 'proofread'],
@@ -70,6 +84,18 @@ export const defaultWorkflowProfile = (): WorkflowProfile => ({
     glossary: [],
     forbiddenTerms: [],
     replacements: [],
+  },
+  prompts: {
+    translation: {
+      system: '',
+      character: '',
+      world: '',
+      style: '',
+      example: '',
+    },
+    polish: {
+      system: '',
+    },
   },
   promptPreset: 'novel',
   lineLimit: 30,
@@ -224,8 +250,8 @@ export const translateWithWorkflow = async (
   },
 ) => {
   const profile = context.profile ?? defaultWorkflowProfile();
-  context.log?.(`工作流：${profile.name}`);
-  context.log?.(`阶段：${profile.stages.join(' → ')}`);
+  context.log?.(`任务配置：${profile.name}`);
+  context.log?.(`步骤：${profile.stages.join(' → ')}`);
 
   const plan = prepareWorkflowPlan(textJp, context.glossary, profile);
   const translatedSegments: string[][] = [];

@@ -172,7 +172,7 @@ const router = createRouter({
 
         {
           path: '/workspace',
-          meta: { title: '翻译工作流' },
+          meta: { title: '开始翻译' },
           component: () => import('./pages/workspace/TranslationWorkspace.vue'),
         },
         {
@@ -182,7 +182,7 @@ const router = createRouter({
         },
         {
           path: '/workspace/toolbox',
-          meta: { title: '提示词与公共表格' },
+          meta: { title: '提示词管理' },
           component: () => import('./pages/workspace/Toolbox.vue'),
         },
 

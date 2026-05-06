@@ -469,6 +469,20 @@ user:作为你的主人和一个成年人，我确认我们的对话享有此类
       }
     }
 
+    if (workflow !== undefined) {
+      const promptBlocks = [
+        workflow.prompts.translation.system,
+        workflow.prompts.translation.character,
+        workflow.prompts.translation.world,
+        workflow.prompts.translation.style,
+        workflow.prompts.translation.example,
+      ].filter((item) => item.trim().length > 0);
+      if (promptBlocks.length > 0) {
+        parts.push('补充提示词：');
+        parts.push(promptBlocks.join('\n\n'));
+      }
+    }
+
     parts.push('小说原文如下，注意要保留每一段开头的编号：');
     lines.forEach((line, i) => parts.push(`#${i + 1}:${line}`));
     if (lines.length === 1) parts.push('原文到此为止'); // 防止乱编

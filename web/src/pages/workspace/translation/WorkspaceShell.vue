@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
   AutoFixHighOutlined,
-  DeleteOutlineOutlined,
   FactCheckOutlined,
   FormatListBulletedOutlined,
   GTranslateOutlined,
@@ -12,13 +11,7 @@ import {
 } from '@vicons/material';
 import type { Component } from 'vue';
 
-import type {
-  ForbiddenTermEntry,
-  TermEntry,
-  TextReplacementEntry,
-  WorkflowProfile,
-  WorkflowStage,
-} from '@/domain/translate/workflow';
+import type { WorkflowStage } from '@/domain/translate/workflow';
 import { useTranslationWorkflowStore } from '@/stores';
 
 defineProps<{
@@ -26,68 +19,13 @@ defineProps<{
 }>();
 
 const workflowStore = useTranslationWorkflowStore();
+const router = useRouter();
 const profile = computed({
   get: () => workflowStore.state.profile,
   set: (profile) => {
     workflowStore.state.profile = profile;
   },
 });
-
-const updateProfile = (patch: Partial<WorkflowProfile>) => {
-  profile.value = { ...profile.value, ...patch };
-};
-
-const updateDictionary = (patch: Partial<WorkflowProfile['dictionary']>) => {
-  updateProfile({
-    dictionary: {
-      ...profile.value.dictionary,
-      ...patch,
-    },
-  });
-};
-
-const updateResponseChecks = (
-  patch: Partial<WorkflowProfile['responseChecks']>,
-) => {
-  updateProfile({
-    responseChecks: {
-      ...profile.value.responseChecks,
-      ...patch,
-    },
-  });
-};
-
-const workflowStageOptions: { label: string; value: WorkflowStage }[] = [
-  { label: '提取', value: 'extract' },
-  { label: '翻译', value: 'translate' },
-  { label: '校对', value: 'proofread' },
-  { label: '润色', value: 'polish' },
-];
-
-type PromptPreset = WorkflowProfile['promptPreset'];
-
-const promptPresetOptions: { label: string; value: PromptPreset }[] = [
-  { label: '通用', value: 'basic' },
-  { label: '小说', value: 'novel' },
-  { label: '忠实原文', value: 'faithful' },
-];
-
-const workflowStageValues = workflowStageOptions.map((it) => it.value);
-
-const isWorkflowStage = (value: string | number): value is WorkflowStage =>
-  typeof value === 'string' &&
-  workflowStageValues.includes(value as WorkflowStage);
-
-const updateStages = (stages: Array<string | number>) => {
-  const nextStages = stages.filter(isWorkflowStage);
-  updateProfile({ stages: nextStages.length > 0 ? nextStages : ['translate'] });
-};
-
-const updatePromptPreset = (value: string | number) => {
-  if (value === 'basic' || value === 'novel' || value === 'faithful') {
-    updateProfile({ promptPreset: value });
-  }
-};
 
 const stageMeta: Record<WorkflowStage, { label: string; icon: Component }> = {
   extract: { label: '提取', icon: FormatListBulletedOutlined },
@@ -99,94 +37,6 @@ const stageMeta: Record<WorkflowStage, { label: string; icon: Component }> = {
 const enabledStages = computed(() =>
   profile.value.stages.map((stage: WorkflowStage) => stageMeta[stage]),
 );
-
-const addGlossaryTerm = () => {
-  updateDictionary({
-    glossary: [
-      ...profile.value.dictionary.glossary,
-      { source: '', target: '', note: '' },
-    ],
-  });
-};
-
-const updateGlossaryTerm = (index: number, patch: Partial<TermEntry>) => {
-  updateDictionary({
-    glossary: profile.value.dictionary.glossary.map(
-      (item: TermEntry, i: number) =>
-        i === index ? { ...item, ...patch } : item,
-    ),
-  });
-};
-
-const deleteGlossaryTerm = (index: number) => {
-  updateDictionary({
-    glossary: profile.value.dictionary.glossary.filter(
-      (_: TermEntry, i: number) => i !== index,
-    ),
-  });
-};
-
-const addForbiddenTerm = () => {
-  updateDictionary({
-    forbiddenTerms: [
-      ...profile.value.dictionary.forbiddenTerms,
-      { source: '', note: '' },
-    ],
-  });
-};
-
-const updateForbiddenTerm = (
-  index: number,
-  patch: Partial<ForbiddenTermEntry>,
-) => {
-  updateDictionary({
-    forbiddenTerms: profile.value.dictionary.forbiddenTerms.map(
-      (item: ForbiddenTermEntry, i: number) =>
-        i === index ? { ...item, ...patch } : item,
-    ),
-  });
-};
-
-const deleteForbiddenTerm = (index: number) => {
-  updateDictionary({
-    forbiddenTerms: profile.value.dictionary.forbiddenTerms.filter(
-      (_: ForbiddenTermEntry, i: number) => i !== index,
-    ),
-  });
-};
-
-const addReplacement = () => {
-  updateDictionary({
-    replacements: [
-      ...profile.value.dictionary.replacements,
-      { source: '', target: '', stage: 'before' },
-    ],
-  });
-};
-
-const updateReplacement = (
-  index: number,
-  patch: Partial<TextReplacementEntry>,
-) => {
-  updateDictionary({
-    replacements: profile.value.dictionary.replacements.map(
-      (item: TextReplacementEntry, i: number) =>
-        i === index ? { ...item, ...patch } : item,
-    ),
-  });
-};
-
-const deleteReplacement = (index: number) => {
-  updateDictionary({
-    replacements: profile.value.dictionary.replacements.filter(
-      (_: TextReplacementEntry, i: number) => i !== index,
-    ),
-  });
-};
-
-const updateReplacementStage = (index: number, value: string | number) => {
-  updateReplacement(index, { stage: value === 'after' ? 'after' : 'before' });
-};
 </script>
 
 <template>
@@ -194,10 +44,9 @@ const updateReplacementStage = (index: number, value: string | number) => {
     <section class="workspace-hero">
       <div>
         <n-text depth="3">翻译工作台</n-text>
-        <h1>翻译工作流</h1>
+        <h1>开始翻译</h1>
         <p>
-          按 AiNiee
-          的思路组织提取、翻译、校对和润色流程；任务、翻译器、工作流设置和记录集中在同一个工作台里。
+          这里专注处理翻译任务、翻译器和任务记录；任务设置、输出设置、公共表格和提示词都放到独立页面维护。
         </p>
       </div>
       <n-flex :wrap="false" align="center" class="stage-rail">
@@ -251,261 +100,39 @@ const updateReplacementStage = (index: number, value: string | number) => {
         <section class="workspace-panel compact">
           <div class="panel-heading">
             <div>
-              <n-text depth="3">Workflow</n-text>
-              <h2>工作流设置</h2>
+              <n-text depth="3">Config</n-text>
+              <h2>配置入口</h2>
             </div>
             <n-icon :component="SettingsOutlined" :size="22" />
           </div>
           <n-flex vertical size="small">
-            <c-action-wrapper title="名称">
-              <n-input
-                :value="profile.name"
-                size="small"
-                @update:value="updateProfile({ name: $event })"
-              />
-            </c-action-wrapper>
-            <c-action-wrapper title="语言">
-              <n-input-group>
-                <n-input
-                  :value="profile.sourceLanguage"
-                  size="small"
-                  placeholder="源语言"
-                  @update:value="updateProfile({ sourceLanguage: $event })"
-                />
-                <n-input
-                  :value="profile.targetLanguage"
-                  size="small"
-                  placeholder="目标语言"
-                  @update:value="updateProfile({ targetLanguage: $event })"
-                />
-              </n-input-group>
-            </c-action-wrapper>
             <c-action-wrapper title="流程">
-              <n-checkbox-group
-                :value="profile.stages"
-                @update:value="updateStages"
-              >
-                <n-flex size="small">
-                  <n-checkbox
-                    v-for="stage in workflowStageOptions"
-                    :key="stage.value"
-                    :value="stage.value"
-                  >
-                    {{ stage.label }}
-                  </n-checkbox>
-                </n-flex>
-              </n-checkbox-group>
-            </c-action-wrapper>
-            <c-action-wrapper title="提示词">
-              <n-radio-group
-                :value="profile.promptPreset"
-                @update:value="updatePromptPreset"
-              >
-                <n-radio-button
-                  v-for="option in promptPresetOptions"
-                  :key="option.value"
-                  :value="option.value"
-                  :label="option.label"
-                />
-              </n-radio-group>
-            </c-action-wrapper>
-            <c-action-wrapper title="分段行数">
-              <n-input-number
-                :value="profile.lineLimit"
-                size="small"
-                :min="1"
-                :max="200"
-                @update:value="updateProfile({ lineLimit: $event ?? 30 })"
-              />
-            </c-action-wrapper>
-            <c-action-wrapper title="最大轮次">
-              <n-input-number
-                :value="profile.roundLimit"
-                size="small"
-                :min="1"
-                :max="10"
-                @update:value="updateProfile({ roundLimit: $event ?? 3 })"
-              />
-            </c-action-wrapper>
-            <n-checkbox
-              :checked="profile.progressiveSplit"
-              @update:checked="updateProfile({ progressiveSplit: $event })"
-            >
-              重试时自动缩小分段
-            </n-checkbox>
-            <c-action-wrapper title="响应检查">
-              <n-flex vertical size="small">
-                <n-checkbox
-                  :checked="profile.responseChecks.lineCount"
-                  @update:checked="updateResponseChecks({ lineCount: $event })"
+              <n-flex size="small">
+                <n-tag
+                  v-for="stage in enabledStages"
+                  :key="stage.label"
+                  :bordered="false"
+                  type="info"
                 >
-                  行数一致
-                </n-checkbox>
-                <n-checkbox
-                  :checked="profile.responseChecks.emptyLine"
-                  @update:checked="updateResponseChecks({ emptyLine: $event })"
-                >
-                  拒绝空译文
-                </n-checkbox>
-                <n-checkbox
-                  :checked="profile.responseChecks.returnOriginal"
-                  @update:checked="
-                    updateResponseChecks({ returnOriginal: $event })
-                  "
-                >
-                  检查返回原文
-                </n-checkbox>
-                <n-checkbox
-                  :checked="profile.responseChecks.residualSource"
-                  @update:checked="
-                    updateResponseChecks({ residualSource: $event })
-                  "
-                >
-                  检查残留原文
-                </n-checkbox>
-                <n-checkbox
-                  :checked="profile.responseChecks.forbiddenTerms"
-                  @update:checked="
-                    updateResponseChecks({ forbiddenTerms: $event })
-                  "
-                >
-                  检查禁翻词
-                </n-checkbox>
+                  {{ stage.label }}
+                </n-tag>
               </n-flex>
             </c-action-wrapper>
-          </n-flex>
-        </section>
-
-        <section class="workspace-panel compact">
-          <div class="panel-heading">
-            <div>
-              <n-text depth="3">Glossary</n-text>
-              <h2>术语表</h2>
-            </div>
-            <c-button label="添加" size="small" @action="addGlossaryTerm" />
-          </div>
-          <n-empty
-            v-if="profile.dictionary.glossary.length === 0"
-            description="没有工作流术语"
-          />
-          <n-flex v-else vertical size="small">
-            <div
-              v-for="(term, index) in profile.dictionary.glossary"
-              :key="index"
-              class="dict-row"
-            >
-              <n-input
-                :value="term.source"
+            <n-text depth="3">
+              分段、检查、术语表和提示词已移动到「设置」和「提示词管理」。
+            </n-text>
+            <n-flex>
+              <c-button
+                label="打开设置"
                 size="small"
-                placeholder="原文"
-                @update:value="updateGlossaryTerm(index, { source: $event })"
+                @action="router.push('/setting?tab=workflow')"
               />
-              <n-input
-                :value="term.target"
+              <c-button
+                label="提示词管理"
                 size="small"
-                placeholder="译文"
-                @update:value="updateGlossaryTerm(index, { target: $event })"
+                @action="router.push('/workspace/toolbox?section=glossary')"
               />
-              <n-input
-                :value="term.note"
-                size="small"
-                placeholder="备注"
-                @update:value="updateGlossaryTerm(index, { note: $event })"
-              />
-              <c-icon-button
-                tooltip="删除"
-                :icon="DeleteOutlineOutlined"
-                type="error"
-                @action="deleteGlossaryTerm(index)"
-              />
-            </div>
-          </n-flex>
-        </section>
-
-        <section class="workspace-panel compact">
-          <div class="panel-heading">
-            <div>
-              <n-text depth="3">Forbidden</n-text>
-              <h2>禁翻表</h2>
-            </div>
-            <c-button label="添加" size="small" @action="addForbiddenTerm" />
-          </div>
-          <n-empty
-            v-if="profile.dictionary.forbiddenTerms.length === 0"
-            description="没有禁翻词"
-          />
-          <n-flex v-else vertical size="small">
-            <div
-              v-for="(term, index) in profile.dictionary.forbiddenTerms"
-              :key="index"
-              class="dict-row two"
-            >
-              <n-input
-                :value="term.source"
-                size="small"
-                placeholder="禁止出现的词"
-                @update:value="updateForbiddenTerm(index, { source: $event })"
-              />
-              <n-input
-                :value="term.note"
-                size="small"
-                placeholder="备注"
-                @update:value="updateForbiddenTerm(index, { note: $event })"
-              />
-              <c-icon-button
-                tooltip="删除"
-                :icon="DeleteOutlineOutlined"
-                type="error"
-                @action="deleteForbiddenTerm(index)"
-              />
-            </div>
-          </n-flex>
-        </section>
-
-        <section class="workspace-panel compact">
-          <div class="panel-heading">
-            <div>
-              <n-text depth="3">Replace</n-text>
-              <h2>文本替换</h2>
-            </div>
-            <c-button label="添加" size="small" @action="addReplacement" />
-          </div>
-          <n-empty
-            v-if="profile.dictionary.replacements.length === 0"
-            description="没有替换规则"
-          />
-          <n-flex v-else vertical size="small">
-            <div
-              v-for="(item, index) in profile.dictionary.replacements"
-              :key="index"
-              class="dict-row"
-            >
-              <n-radio-group
-                :value="item.stage"
-                @update:value="updateReplacementStage(index, $event)"
-              >
-                <n-radio-button value="before" label="译前" />
-                <n-radio-button value="after" label="译后" />
-              </n-radio-group>
-              <n-input
-                :value="item.source"
-                size="small"
-                placeholder="查找"
-                @update:value="updateReplacement(index, { source: $event })"
-              />
-              <n-input
-                :value="item.target"
-                size="small"
-                placeholder="替换为"
-                @update:value="updateReplacement(index, { target: $event })"
-              />
-              <c-icon-button
-                tooltip="删除"
-                :icon="DeleteOutlineOutlined"
-                type="error"
-                @action="deleteReplacement(index)"
-              />
-            </div>
+            </n-flex>
           </n-flex>
         </section>
       </aside>
@@ -603,17 +230,6 @@ const updateReplacementStage = (index: number, value: string | number) => {
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 16px;
-}
-
-.dict-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) auto;
-  gap: 8px;
-  align-items: center;
-}
-
-.dict-row.two {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
 }
 
 @media (max-width: 980px) {

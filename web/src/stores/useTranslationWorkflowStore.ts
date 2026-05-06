@@ -25,6 +25,18 @@ export namespace TranslationWorkflowState {
         ...defaults.profile.dictionary,
         ...(currentProfile.dictionary ?? {}),
       },
+      prompts: {
+        ...defaults.profile.prompts,
+        ...(currentProfile.prompts ?? {}),
+        translation: {
+          ...defaults.profile.prompts.translation,
+          ...(currentProfile.prompts?.translation ?? {}),
+        },
+        polish: {
+          ...defaults.profile.prompts.polish,
+          ...(currentProfile.prompts?.polish ?? {}),
+        },
+      },
       responseChecks: {
         ...defaults.profile.responseChecks,
         ...(currentProfile.responseChecks ?? {}),

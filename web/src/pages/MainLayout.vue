@@ -99,35 +99,29 @@ const menuOptions = computed<MenuOption[]>(() => {
       props: { style: { marginTop: '16px', marginBottom: '16px' } },
     },
     {
-      label: '翻译工作流',
-      icon: renderIcon(WorkspacesOutlined),
+      label: renderLabel('开始翻译', '/workspace'),
+      icon: renderIcon(RocketLaunchOutlined),
       key: '/workspace',
-      children: [
-        {
-          label: renderLabel('开始翻译', '/workspace'),
-          icon: renderIcon(RocketLaunchOutlined),
-          key: '/workspace',
-        },
-        {
-          label: renderLabel('任务设置', '/setting'),
-          icon: renderIcon(SettingsOutlined),
-          key: '/setting/workflow',
-        },
-        {
-          label: renderLabel('输出设置', '/setting'),
-          icon: renderIcon(BuildOutlined),
-          key: '/setting/output',
-        },
-        {
-          label: renderLabel('术语表', '/workspace/toolbox'),
-          icon: renderIcon(ListAltOutlined),
-          key: '/workspace/toolbox',
-        },
-        {
-          label: renderLabel('交互翻译', '/workspace/interactive'),
-          key: '/workspace/interactive',
-        },
-      ],
+    },
+    {
+      label: renderLabel('交互翻译', '/workspace/interactive'),
+      icon: renderIcon(WorkspacesOutlined),
+      key: '/workspace/interactive',
+    },
+    {
+      label: renderLabel('提示词管理', '/workspace/toolbox'),
+      icon: renderIcon(ListAltOutlined),
+      key: '/workspace/toolbox',
+    },
+    {
+      label: renderLabel('任务设置', '/setting?tab=workflow'),
+      icon: renderIcon(SettingsOutlined),
+      key: '/setting?tab=workflow',
+    },
+    {
+      label: renderLabel('输出设置', '/setting?tab=output'),
+      icon: renderIcon(BuildOutlined),
+      key: '/setting?tab=output',
     },
     {
       label: renderLabel('设置', '/setting'),
@@ -162,6 +156,12 @@ const menuOptions = computed<MenuOption[]>(() => {
 });
 
 const menuKey = computed(() => {
+  if (route.path === '/setting' && route.query.tab === 'workflow') {
+    return '/setting?tab=workflow';
+  }
+  if (route.path === '/setting' && route.query.tab === 'output') {
+    return '/setting?tab=output';
+  }
   const path = route.path;
   for (const key of ['/novel', '/wenku', '/favorite']) {
     if (path.startsWith(key)) {
