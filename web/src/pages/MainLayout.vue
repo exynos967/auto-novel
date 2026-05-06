@@ -1,17 +1,25 @@
 <script lang="ts" setup>
 import {
+  AutoFixHighOutlined,
+  BlockOutlined,
   BookOutlined,
   CandlestickChartOutlined,
   DarkModeOutlined,
   HistoryOutlined,
   HomeOutlined,
+  ImportExportOutlined,
   LanguageOutlined,
   ListAltOutlined,
   LogOutOutlined,
+  MenuBookOutlined,
   MenuOutlined,
+  PeopleOutlineOutlined,
+  PublicOutlined,
   RocketLaunchOutlined,
   SettingsOutlined,
   StarBorderOutlined,
+  StyleOutlined,
+  TranslateOutlined,
   WbSunnyOutlined,
   WorkspacesOutlined,
 } from '@vicons/material';
@@ -64,82 +72,164 @@ const menuOptions = computed<MenuOption[]>(() => {
 
   return [
     {
-      label: renderLabel('首页', '/'),
-      icon: renderIcon(HomeOutlined),
-      key: '/',
+      type: 'group',
+      key: 'browse',
+      label: '浏览',
+      children: [
+        {
+          label: renderLabel('首页', '/'),
+          icon: renderIcon(HomeOutlined),
+          key: '/',
+        },
+        {
+          label: renderLabel(
+            '我的收藏',
+            whoami.value.isSignedIn ? '/favorite/web' : '/favorite/local',
+          ),
+          icon: renderIcon(StarBorderOutlined),
+          key: '/favorite',
+        },
+        {
+          label: renderLabel('阅读历史', '/read-history'),
+          icon: renderIcon(HistoryOutlined),
+          key: '/read-history',
+          show: whoami.value.isSignedIn,
+        },
+        {
+          label: renderLabel('网络小说', '/novel'),
+          icon: renderIcon(LanguageOutlined),
+          key: '/novel',
+        },
+        {
+          label: renderLabel('文库小说', '/wenku'),
+          icon: renderIcon(BookOutlined),
+          key: '/wenku',
+        },
+      ],
     },
     {
-      label: renderLabel(
-        '我的收藏',
-        whoami.value.isSignedIn ? '/favorite/web' : '/favorite/local',
-      ),
-      icon: renderIcon(StarBorderOutlined),
-      key: '/favorite',
+      type: 'group',
+      key: 'workspace',
+      label: '翻译工作台',
+      children: [
+        {
+          label: renderLabel('开始翻译', '/workspace'),
+          icon: renderIcon(RocketLaunchOutlined),
+          key: '/workspace',
+        },
+        {
+          label: renderLabel('任务设置', '/workspace/task-settings'),
+          icon: renderIcon(ListAltOutlined),
+          key: '/workspace/task-settings',
+        },
+        {
+          label: renderLabel('输出设置', '/workspace/output-settings'),
+          icon: renderIcon(SettingsOutlined),
+          key: '/workspace/output-settings',
+        },
+      ],
     },
     {
-      label: renderLabel('阅读历史', '/read-history'),
-      icon: renderIcon(HistoryOutlined),
-      key: '/read-history',
-      show: whoami.value.isSignedIn,
+      type: 'group',
+      key: 'prompts',
+      label: '提示词管理',
+      children: [
+        {
+          label: renderLabel('基础提示', '/workspace/prompts/base'),
+          icon: renderIcon(TranslateOutlined),
+          key: '/workspace/prompts/base',
+        },
+        {
+          label: renderLabel('角色介绍', '/workspace/prompts/character'),
+          icon: renderIcon(PeopleOutlineOutlined),
+          key: '/workspace/prompts/character',
+        },
+        {
+          label: renderLabel('背景设定', '/workspace/prompts/world'),
+          icon: renderIcon(PublicOutlined),
+          key: '/workspace/prompts/world',
+        },
+        {
+          label: renderLabel('翻译风格', '/workspace/prompts/style'),
+          icon: renderIcon(StyleOutlined),
+          key: '/workspace/prompts/style',
+        },
+        {
+          label: renderLabel('翻译示例', '/workspace/prompts/example'),
+          icon: renderIcon(MenuBookOutlined),
+          key: '/workspace/prompts/example',
+        },
+        {
+          label: renderLabel('润色提示词', '/workspace/prompts/polish'),
+          icon: renderIcon(AutoFixHighOutlined),
+          key: '/workspace/prompts/polish',
+        },
+      ],
     },
     {
-      label: renderLabel('网络小说', '/novel'),
-      icon: renderIcon(LanguageOutlined),
-      key: '/novel',
+      type: 'group',
+      key: 'tables',
+      label: '公共表格',
+      children: [
+        {
+          label: renderLabel('术语表', '/workspace/tables/glossary'),
+          icon: renderIcon(MenuBookOutlined),
+          key: '/workspace/tables/glossary',
+        },
+        {
+          label: renderLabel('禁翻表', '/workspace/tables/forbidden'),
+          icon: renderIcon(BlockOutlined),
+          key: '/workspace/tables/forbidden',
+        },
+        {
+          label: renderLabel('文本替换', '/workspace/tables/replace'),
+          icon: renderIcon(ImportExportOutlined),
+          key: '/workspace/tables/replace',
+        },
+      ],
     },
     {
-      label: renderLabel('文库小说', '/wenku'),
-      icon: renderIcon(BookOutlined),
-      key: '/wenku',
-    },
-    {
-      type: 'divider',
-      key: 'divider',
-      props: { style: { marginTop: '16px', marginBottom: '16px' } },
-    },
-    {
-      label: renderLabel('开始翻译', '/workspace'),
-      icon: renderIcon(RocketLaunchOutlined),
-      key: '/workspace',
-    },
-    {
-      label: renderLabel('交互翻译', '/workspace/interactive'),
-      icon: renderIcon(WorkspacesOutlined),
-      key: '/workspace/interactive',
-    },
-    {
-      label: renderLabel('提示词管理', '/workspace/toolbox'),
-      icon: renderIcon(ListAltOutlined),
-      key: '/workspace/toolbox',
-    },
-    {
-      label: renderLabel('设置', '/setting'),
-      icon: renderIcon(SettingsOutlined),
-      key: '/setting',
-    },
-    {
-      label: () =>
-        h(
-          'a',
-          {
-            onClick: () => {
-              if (theme === 'light') {
-                setting.value.theme = 'dark';
-              } else {
-                setting.value.theme = 'light';
-              }
-            },
-          },
-          { default: () => '切换主题' },
-        ),
-      icon: renderIcon(theme === 'light' ? WbSunnyOutlined : DarkModeOutlined),
-      key: 'theme',
-    },
-    {
-      label: renderLabel('控制台', '/admin'),
-      icon: renderIcon(CandlestickChartOutlined),
-      key: '/admin',
-      show: whoami.value.asAdmin,
+      type: 'group',
+      key: 'other',
+      label: '其他',
+      children: [
+        {
+          label: renderLabel('交互翻译', '/workspace/interactive'),
+          icon: renderIcon(WorkspacesOutlined),
+          key: '/workspace/interactive',
+        },
+        {
+          label: renderLabel('设置', '/setting'),
+          icon: renderIcon(SettingsOutlined),
+          key: '/setting',
+        },
+        {
+          label: () =>
+            h(
+              'a',
+              {
+                onClick: () => {
+                  if (theme === 'light') {
+                    setting.value.theme = 'dark';
+                  } else {
+                    setting.value.theme = 'light';
+                  }
+                },
+              },
+              { default: () => '切换主题' },
+            ),
+          icon: renderIcon(
+            theme === 'light' ? WbSunnyOutlined : DarkModeOutlined,
+          ),
+          key: 'theme',
+        },
+        {
+          label: renderLabel('控制台', '/admin'),
+          icon: renderIcon(CandlestickChartOutlined),
+          key: '/admin',
+          show: whoami.value.asAdmin,
+        },
+      ],
     },
   ];
 });

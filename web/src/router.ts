@@ -181,10 +181,68 @@ const router = createRouter({
           component: () => import('./pages/workspace/Interactive.vue'),
         },
         {
-          path: '/workspace/toolbox',
-          meta: { title: '提示词管理' },
-          component: () => import('./pages/workspace/Toolbox.vue'),
+          path: '/workspace/task-settings',
+          meta: { title: '任务设置' },
+          component: () => import('./pages/workspace/TaskSettings.vue'),
         },
+        {
+          path: '/workspace/output-settings',
+          meta: { title: '输出设置' },
+          component: () => import('./pages/workspace/OutputSettings.vue'),
+        },
+        {
+          path: '/workspace/tables/glossary',
+          meta: { title: '术语表' },
+          component: () => import('./pages/workspace/tables/GlossaryPage.vue'),
+        },
+        {
+          path: '/workspace/tables/forbidden',
+          meta: { title: '禁翻表' },
+          component: () => import('./pages/workspace/tables/ForbiddenPage.vue'),
+        },
+        {
+          path: '/workspace/tables/replace',
+          meta: { title: '文本替换' },
+          component: () => import('./pages/workspace/tables/ReplacePage.vue'),
+        },
+        {
+          path: '/workspace/prompts/base',
+          meta: { title: '基础提示' },
+          component: () =>
+            import('./pages/workspace/prompts/BasePromptPage.vue'),
+        },
+        {
+          path: '/workspace/prompts/character',
+          meta: { title: '角色介绍' },
+          component: () =>
+            import('./pages/workspace/prompts/CharacterPromptPage.vue'),
+        },
+        {
+          path: '/workspace/prompts/world',
+          meta: { title: '背景设定' },
+          component: () =>
+            import('./pages/workspace/prompts/WorldPromptPage.vue'),
+        },
+        {
+          path: '/workspace/prompts/style',
+          meta: { title: '翻译风格' },
+          component: () =>
+            import('./pages/workspace/prompts/StylePromptPage.vue'),
+        },
+        {
+          path: '/workspace/prompts/example',
+          meta: { title: '翻译示例' },
+          component: () =>
+            import('./pages/workspace/prompts/ExamplePromptPage.vue'),
+        },
+        {
+          path: '/workspace/prompts/polish',
+          meta: { title: '润色提示词' },
+          component: () =>
+            import('./pages/workspace/prompts/PolishPromptPage.vue'),
+        },
+        // 兼容旧路由
+        { path: '/workspace/toolbox', redirect: '/workspace/tables/glossary' },
 
         {
           path: '/setting',

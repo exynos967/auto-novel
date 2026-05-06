@@ -119,18 +119,18 @@ const enabledStages = computed(() =>
               </n-flex>
             </c-action-wrapper>
             <n-text depth="3">
-              分段、检查、术语表和提示词已移动到「设置」和「提示词管理」。
+              分段和检查已移动到「任务设置」，术语表和提示词已移动到侧边栏独立页面。
             </n-text>
             <n-flex>
               <c-button
-                label="打开设置"
+                label="任务设置"
                 size="small"
-                @action="router.push('/setting?tab=workflow')"
+                @action="router.push('/workspace/task-settings')"
               />
               <c-button
-                label="提示词管理"
+                label="术语表"
                 size="small"
-                @action="router.push('/workspace/toolbox?section=glossary')"
+                @action="router.push('/workspace/tables/glossary')"
               />
             </n-flex>
           </n-flex>
