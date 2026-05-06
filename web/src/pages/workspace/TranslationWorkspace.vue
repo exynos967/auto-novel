@@ -41,6 +41,17 @@ const workspaceRef = computed(() => workspace.value.ref.value);
 
 const showLocalVolumeDrawer = ref(false);
 
+type WorkspaceWorker =
+  | ({ translatorId: 'gpt' } & GptWorker)
+  | ({ translatorId: 'sakura' } & SakuraWorker);
+
+const toWorkspaceWorker = (
+  worker: GptWorker | SakuraWorker,
+): WorkspaceWorker =>
+  'type' in worker
+    ? { translatorId: 'gpt', ...worker }
+    : { translatorId: 'sakura', ...worker };
+
 const workerTranslatorId = (worker: GptWorker | SakuraWorker) =>
   'type' in worker ? 'gpt' : 'sakura';
 
@@ -154,10 +165,7 @@ const clearCache = async () =>
                 :key="worker.id"
               >
                 <job-worker
-                  :worker="{
-                    translatorId: workerTranslatorId(worker),
-                    ...worker,
-                  }"
+                  :worker="toWorkspaceWorker(worker)"
                   :get-next-job="getNextJob"
                   :job-version="queuedJobVersion"
                   :auto-start="shouldAutoStart(worker)"

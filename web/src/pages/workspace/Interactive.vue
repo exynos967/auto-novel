@@ -60,7 +60,7 @@ const translate = async () => {
       endpoint: worker.endpoint,
       key: worker.key,
     };
-  } else if (id === 'sakura') {
+  } else {
     const worker = sakuraWorkspaceRef.value.workers.find(
       (it) => it.id === selectedSakuraWorkerId.value,
     );
